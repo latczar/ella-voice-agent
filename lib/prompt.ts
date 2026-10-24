@@ -34,7 +34,8 @@ function template(name: string): HandlebarsTemplateDelegate {
 /** Vapi fills these Liquid variables at call time. */
 function vapiVariables(c: ClientConfig) {
   return {
-    callerId: "{{customer.number}}",
+    // Spelled out when there's no number (browser calls), so the model never fills a blank with a guess.
+    callerId: "{% if customer.number %}{{customer.number}}{% else %}NONE on this call (browser call). Ask the caller for their number; never invent one.{% endif %}",
     now: `{{"now" | date: "%A, %B %-d, %Y, %-I:%M %p", "${c.locale.timezone}"}}`,
   };
 }

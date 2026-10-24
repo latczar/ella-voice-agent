@@ -8,7 +8,7 @@ import { createBooking, eventTypeId, getSlots } from "../integrations/calcom";
 import { sendPush } from "../integrations/ntfy";
 import { sendSms } from "../integrations/sms";
 import type { CallContext } from "./context";
-import { logError, mergeLead, recordAction, upsertCall, type LeadRow } from "./db";
+import { getLead, logError, mergeLead, recordAction, upsertCall, type LeadRow } from "./db";
 
 type Args = Record<string, unknown>;
 export type ToolHandler = (args: Args, ctx: CallContext) => Promise<object>;
@@ -180,7 +180,13 @@ const book_appointment: ToolHandler = async (args, ctx) => {
     start, name, email: ctx.isTest ? "jrco-ella-tests@mailinator.com" : email, phone, address, timeZone: c.locale.timezone, notes: s(args.notes), callId: ctx.callId,
   });
   await touchCall(ctx, { outcome: "booked" });
-  await mergeLead({ call_id: ctx.callId, client_id: c.client_id, full_name: name, email, phone, property_address: address });
+  // Safety net if log_lead was skipped: a booking implies the intent whose team falls back to calendar bookings.
+  const existing = await getLead(ctx.callId);
+  const bookingIntent = existing?.intent ? undefined : c.intents.find((i) => !!i.department && c.departments[i.department]?.after_hours_fallback.includes("calendar_booking"));
+  await mergeLead({
+    call_id: ctx.callId, client_id: c.client_id, full_name: name, email, phone, property_address: address,
+    ...(bookingIntent ? { intent: bookingIntent.id, caller_need: bookingIntent.caller_need } : {}),
+  });
   await recordAction(ctx.callId, "booking", "ok", { uid: booking.uid, start: booking.start, status: booking.status });
   return { booked: true, status: booking.status, confirmation: "A confirmation email is on its way to the caller." };
 };
