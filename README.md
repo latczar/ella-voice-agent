@@ -14,7 +14,7 @@ Ella answers every call to JR&CO Roofing (a fictional US roofer), 24/7: she answ
   <tr>
     <td align="center" width="33%">
       <a href="https://ella-voice-agent.vercel.app/demo/phone-emergency.mp4"><img src="docs/demo/phone-emergency.jpg" width="200" alt="Phone call: emergency roof leak"></a><br>
-      <b>▶ Emergency</b>: alert arrives, hand-off to on-call
+      <b>▶ Emergency</b>: alert arrives, hand-off to Mike (on-call)
     </td>
     <td align="center" width="33%">
       <a href="https://ella-voice-agent.vercel.app/demo/phone-booking.mp4"><img src="docs/demo/phone-booking.jpg" width="200" alt="Phone call: after-hours inspection booking"></a><br>
