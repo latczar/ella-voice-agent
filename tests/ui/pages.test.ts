@@ -10,7 +10,8 @@ const BASE = (process.env.TEST_BASE_URL || process.env.PUBLIC_BASE_URL || "http:
 async function page(path: string): Promise<string> {
   const res = await fetch(`${BASE}${path}`);
   assert.equal(res.status, 200, `${path} returned ${res.status}`);
-  return res.text();
+  // Drop React's text-boundary comments so "Talk to <!-- -->Ella" matches "Talk to Ella".
+  return (await res.text()).replace(/<!-- -->/g, "");
 }
 
 describe(`dashboard at ${BASE}`, () => {

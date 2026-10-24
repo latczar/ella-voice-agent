@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // The webhooks read client configs, prompts and KB files from disk at runtime,
-  // so make sure Vercel ships them with the functions.
+  // The webhooks and dashboard pages read client configs (and provisioning state),
+  // prompts and KB files from disk at runtime, so make sure Vercel ships them with
+  // every server function, pages included.
   outputFileTracingIncludes: {
-    "/api/**": ["./configs/**", "./prompts/**", "./kb/**"],
+    "/**": ["./configs/**", "./prompts/**", "./kb/**"],
   },
 };
 
