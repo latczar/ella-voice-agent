@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import Nav from "./nav";
+import ThemeToggle from "./theme-toggle";
 import { formatUsNumber, siteInfo } from "@/lib/public-data";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -12,6 +13,9 @@ export const metadata = {
   title: "Ella console · JR&CO Roofing",
   description: "Calls, leads and test results for Ella, the AI receptionist for JR&CO Roofing (fictional client).",
 };
+
+// Runs in <head> before paint, so a saved theme choice applies without a flash of the wrong one.
+const THEME_INIT = `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
 function RoofMark() {
   return (
@@ -25,7 +29,10 @@ function RoofMark() {
 export default function RootLayout({ children }: { children: ReactNode }) {
   const site = siteInfo();
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+      </head>
       <body>
         <header className="topbar">
           <div className="topbar-inner">
@@ -41,6 +48,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   {formatUsNumber(site.number)}
                 </a>
               )}
+              <ThemeToggle />
               <Link className="btn btn-primary" href="/#talk">Talk to {site.agentName}</Link>
             </div>
           </div>

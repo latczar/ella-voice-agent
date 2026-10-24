@@ -26,8 +26,9 @@
   color-scheme: light;
 }
 
+/* Dark palette: follows the system unless the toggle has picked a theme (data-theme on <html>). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0b1120;
     --surface: #111827;
     --surface-2: #1a2333;
@@ -50,6 +51,30 @@
     --shadow: none;
     color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b1120;
+  --surface: #111827;
+  --surface-2: #1a2333;
+  --border: #1f2a3c;
+  --border-strong: #334155;
+  --text: #e5e9f0;
+  --text-2: #a3aec2;
+  --text-3: #64748b;
+  --accent: #7aa2d6;
+  --accent-hover: #9bbbe4;
+  --accent-soft: #16243a;
+  --ok: #4ade80;
+  --ok-soft: #10261a;
+  --warn: #f59e0b;
+  --warn-soft: #2a1d0a;
+  --bad: #f87171;
+  --bad-soft: #2a1212;
+  --info: #93b4f5;
+  --info-soft: #14203a;
+  --shadow: none;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -167,3 +192,6 @@ table.table { width: 100%; border-collapse: collapse; }
 .notice.warn { background: var(--warn-soft); border-color: transparent; color: var(--warn); }
 
 .footer { max-width: 1200px; margin: 0 auto; padding: 24px; color: var(--text-3); font-size: 12px; border-top: 1px solid var(--border); }
+
+.theme-toggle { width: 34px; padding: 0; justify-content: center; color: var(--text-2); }
+.theme-toggle:hover { color: var(--text); }
