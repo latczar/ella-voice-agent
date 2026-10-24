@@ -31,9 +31,19 @@ type VapiMessage = Record<string, any>;
 
 export function callContext(config: ClientConfig, message: VapiMessage): CallContext {
   const call = message.call ?? {};
-  const vars = { ...(call.assistantOverrides?.variableValues ?? {}), ...(message.chat?.assistantOverrides?.variableValues ?? {}) };
+  const chat = message.chat ?? {};
+  // Calls carry variables on call.assistantOverrides; chats have used several places.
+  const vars = {
+    ...(call.assistantOverrides?.variableValues ?? {}),
+    ...(chat.metadata?.variableValues ?? {}),
+    ...(chat.assistantOverrides?.variableValues ?? {}),
+    ...(message.assistant?.variableValues ?? {}),
+    ...(message.variableValues ?? {}),
+  };
   const callType: string = call.type ?? "";
   const channel: CallContext["channel"] = message.chat ? "chat" : callType === "webCall" ? "web" : "phone";
+  // Every chat turn is a new chat object; tests pass a session ID so one conversation is one call record.
+  const testSession = typeof vars.test_session === "string" && /^[\w-]{8,64}$/.test(vars.test_session) ? vars.test_session : null;
   const isTest = vars.is_test === true || vars.is_test === "true";
 
   const simulated = [vars.simulate_unanswered, process.env.SIMULATE_UNANSWERED]
@@ -42,7 +52,7 @@ export function callContext(config: ClientConfig, message: VapiMessage): CallCon
 
   return {
     config,
-    callId: call.id ?? message.chat?.id ?? `unknown-${Date.now()}`,
+    callId: (isTest && testSession) || (call.id ?? chat.id ?? `unknown-${Date.now()}`),
     callerNumber: message.customer?.number ?? call.customer?.number ?? null,
     channel: isTest && channel === "phone" ? "test" : channel,
     isTest,

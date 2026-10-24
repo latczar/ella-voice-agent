@@ -99,7 +99,8 @@ function sentences(s: string): number { return s.split(/[.!?]+(?=\s|$)/).filter(
 
 async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean; cost: number }> {
   const startedAt = new Date();
-  const variableValues: Record<string, string> = { is_test: "true" };
+  // test_session ties every chat turn of this conversation to one call record in Supabase.
+  const variableValues: Record<string, string> = { is_test: "true", test_session: `test-${crypto.randomUUID()}` };
   if (p.time) variableValues.simulate_time = p.time;
   if (p.simulate_unanswered) variableValues.simulate_unanswered = p.simulate_unanswered;
 
@@ -117,7 +118,8 @@ async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean;
     const ella = await chat({
       assistantId: ELLA,
       input: callerLine.replace("[END]", "").trim(),
-      ...(ellaChatId ? { previousChatId: ellaChatId } : { assistantOverrides: { variableValues } }),
+      assistantOverrides: { variableValues },
+      ...(ellaChatId ? { previousChatId: ellaChatId } : {}),
     });
     ellaChatId = ella.id;
     cost += ella.cost ?? 0;
@@ -137,7 +139,8 @@ async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean;
 
     const lastElla = ellaTurns.at(-1) ?? "";
     const caller = await chat({
-      ...(callerChatId ? { previousChatId: callerChatId } : { assistant: callerAssistant(p) }),
+      assistant: callerAssistant(p),
+      ...(callerChatId ? { previousChatId: callerChatId } : {}),
       input: `Ella said: "${lastElla}"`,
     });
     callerChatId = caller.id;
