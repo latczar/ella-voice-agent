@@ -19,7 +19,8 @@
     "build": "next build",
     "start": "next start",
     "env:vercel": "tsx scripts/env-for-vercel.ts",
-    "check": "tsx scripts/check-integrations.ts"
+    "check": "tsx scripts/check-integrations.ts",
+    "seed-demo": "tsx scripts/seed-demo.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

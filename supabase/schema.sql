@@ -120,19 +120,43 @@ alter table errors       enable row level security;
 alter table test_runs    enable row level security;
 alter table test_results enable row level security;
 
--- Public, read-only views for the dashboard: demo and test calls only.
+-- Public, read-only views for the dashboard.
+-- Demo and test calls are shown in full. Real calls are listed (time, intent, route,
+-- outcome, duration, cost) but personal details, transcripts, summaries and recordings
+-- are hidden, so real callers' details never appear publicly.
 -- security_invoker = false: the views run as their owner, so they can read the base
 -- tables while anon still can't query those tables directly.
-create or replace view public_calls with (security_invoker = false) as
+drop view if exists public_calls;
+create view public_calls with (security_invoker = false) as
   select id, client_id, started_at, duration_s, channel, intent, route, route_reason, outcome,
-         ended_reason, cost_usd, recording_url, transcript, summary, is_demo, is_test
-  from calls where is_demo or is_test;
+         ended_reason, cost_usd,
+         case when is_demo or is_test then recording_url end as recording_url,
+         case when is_demo or is_test then transcript end    as transcript,
+         case when is_demo or is_test then summary end       as summary,
+         is_demo, is_test,
+         not (is_demo or is_test)                            as redacted
+  from calls;
 
-create or replace view public_leads with (security_invoker = false) as
-  select l.* from leads l join calls c on c.id = l.call_id where c.is_demo or c.is_test;
+drop view if exists public_leads;
+create view public_leads with (security_invoker = false) as
+  select l.call_id, l.client_id, l.intent, l.caller_need, l.property_type, l.urgency,
+         l.callback_requested, l.created_at,
+         (c.is_demo or c.is_test) as visible,
+         case when c.is_demo or c.is_test then l.full_name else left(l.full_name, 1) || '.' end              as full_name,
+         case when c.is_demo or c.is_test then l.phone else '••• ••• ' || right(l.phone, 2) end              as phone,
+         case when c.is_demo or c.is_test then l.email end                                                   as email,
+         case when c.is_demo or c.is_test then l.property_address when l.property_address is not null then 'Hidden' end as property_address,
+         case when c.is_demo or c.is_test then l.company_name end                                            as company_name,
+         l.facility_type, l.roof_size_or_buildings,
+         case when c.is_demo or c.is_test then l.pm_name end                                                 as pm_name,
+         case when c.is_demo or c.is_test then l.invoice_or_account_number end                               as invoice_or_account_number,
+         case when c.is_demo or c.is_test then l.summary end                                                 as summary
+  from leads l join calls c on c.id = l.call_id;
 
-create or replace view public_actions with (security_invoker = false) as
-  select a.* from actions a join calls c on c.id = a.call_id where c.is_demo or c.is_test;
+-- Actions carry no personal details in the fields we show (kind, status, time).
+drop view if exists public_actions;
+create view public_actions with (security_invoker = false) as
+  select a.id, a.call_id, a.kind, a.status, a.created_at from actions a;
 
 -- Health panel: counts only, no personal data, so it can include real calls.
 create or replace view public_health with (security_invoker = false) as

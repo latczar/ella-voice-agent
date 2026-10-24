@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ella-dashboard",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "-p", "3108"],
+      "port": 3108
+    }
+  ]
+}

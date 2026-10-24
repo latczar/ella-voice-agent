@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 type Status = "idle" | "connecting" | "live" | "ended" | "error";
 interface Line {
-  role: string;
+  agent: boolean;
   text: string;
 }
 
@@ -18,28 +18,32 @@ export default function TalkToElla({ assistantId, agentName }: { assistantId: st
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [lines, setLines] = useState<Line[]>([]);
+  const [speaking, setSpeaking] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!publicKey) return;
     const v = new Vapi(publicKey);
     v.on("call-start", () => setStatus("live"));
-    v.on("call-end", () => setStatus("ended"));
+    v.on("call-end", () => { setStatus("ended"); setSpeaking(false); });
+    v.on("speech-start", () => setSpeaking(true));
+    v.on("speech-end", () => setSpeaking(false));
     v.on("error", (e: unknown) => {
       setStatus("error");
-      setError(e instanceof Error ? e.message : "The call couldn't connect. Check your microphone permission and try again.");
+      setError(e instanceof Error ? e.message : "The call couldn't connect. Check microphone access and try again.");
     });
     v.on("message", (m: { type?: string; transcriptType?: string; role?: string; transcript?: string }) => {
       if (m.type === "transcript" && m.transcriptType === "final" && m.transcript) {
-        setLines((prev) => [...prev, { role: m.role === "user" ? "You" : agentName, text: m.transcript! }]);
+        setLines((prev) => [...prev, { agent: m.role !== "user", text: m.transcript! }]);
       }
     });
     vapi.current = v;
-    return () => {
-      v.stop();
-    };
-  }, [publicKey, agentName]);
+    return () => { v.stop(); };
+  }, [publicKey]);
 
-  if (!publicKey) return <p style={{ color: "#8a4b00" }}>Browser calls aren&apos;t configured yet (missing Vapi public key).</p>;
+  useEffect(() => { endRef.current?.scrollIntoView({ block: "nearest" }); }, [lines]);
+
+  if (!publicKey) return <div className="notice warn">Browser calls aren&apos;t configured on this deployment (missing Vapi public key).</div>;
 
   const start = async () => {
     setError(null);
@@ -55,30 +59,32 @@ export default function TalkToElla({ assistantId, agentName }: { assistantId: st
   const live = status === "connecting" || status === "live";
 
   return (
-    <section>
-      <button
-        onClick={live ? () => vapi.current?.stop() : start}
-        style={{
-          padding: "12px 20px", fontSize: 16, borderRadius: 999, border: "none", cursor: "pointer",
-          background: live ? "#b42318" : "#0b6e4f", color: "white",
-        }}
-      >
-        {status === "connecting" ? "Connecting…" : live ? "End call" : `Talk to ${agentName}`}
-      </button>
-      <span style={{ marginLeft: 12, color: "#555" }}>
-        {status === "live" && "Live: speak normally. Allow microphone access if asked."}
-        {status === "ended" && "Call ended."}
-      </span>
-      {error && <p style={{ color: "#b42318" }}>{error}</p>}
+    <div className="call-panel">
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <button className={`btn ${live ? "btn-danger" : "btn-primary"}`} onClick={live ? () => vapi.current?.stop() : start} disabled={status === "connecting"}>
+          {status === "connecting" ? "Connecting…" : live ? "End call" : `Start browser call`}
+        </button>
+        {status === "live" && (
+          <span className="muted" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span className="live-dot" /> {speaking ? `${agentName} is speaking` : "Listening"}
+          </span>
+        )}
+        {status === "ended" && <span className="muted">Call ended. It will appear in Calls shortly.</span>}
+      </div>
+      {error && <div className="notice warn">{error}</div>}
       {lines.length > 0 && (
-        <ol style={{ listStyle: "none", padding: 0, marginTop: 16, maxHeight: 320, overflowY: "auto" }}>
-          {lines.map((l, i) => (
-            <li key={i} style={{ margin: "6px 0" }}>
-              <strong>{l.role}:</strong> {l.text}
-            </li>
-          ))}
-        </ol>
+        <div className="card" style={{ boxShadow: "none" }}>
+          <div className="card-body transcript" style={{ maxHeight: 280 }}>
+            {lines.map((l, i) => (
+              <div key={i} className={`turn${l.agent ? " agent" : ""}`}>
+                <div className="turn-role">{l.agent ? agentName : "You"}</div>
+                <div>{l.text}</div>
+              </div>
+            ))}
+            <div ref={endRef} />
+          </div>
+        </div>
       )}
-    </section>
+    </div>
   );
 }
