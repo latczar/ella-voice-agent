@@ -1,0 +1,33 @@
+{
+  "client_id": "jrco",
+  "environment": "staging",
+  "updated_at": "2026-10-24T15:43:57.058Z",
+  "assistants": {
+    "residential_sales": "5d737c71-8bdb-403a-b91e-5d0dce9def09",
+    "commercial": "be9c5b63-5d93-47cb-89b5-ec77a3c4b81c",
+    "on_call": "0aa2b416-7b7b-4b21-8383-6032b764b2b6",
+    "operations": "42593401-7d19-4b66-9c56-76ae2c719acb",
+    "finance": "6ec33cab-a826-4c88-84e7-e02411c4f1f7",
+    "ella": "c9edcdab-eccb-4d33-ba54-e0ad7c180623"
+  },
+  "tools": {
+    "check_hours": "f9f99596-7dde-49c0-806a-fd5c1859a625",
+    "log_lead": "9383648c-f87a-4263-b917-0d7f249c1019",
+    "send_emergency_alert": "8a98c724-51b3-478a-86ea-3d297b440478",
+    "check_availability": "3196dea8-1844-45a2-9ac0-f5df88ec2201",
+    "book_appointment": "d15e34f9-2ce5-4e95-b172-1cba1963cc36",
+    "end_call": "6499db49-6392-444b-a6fd-c2b7dc43080b",
+    "transfer_to_residential_sales": "ea33e1ad-5b26-4604-9232-cc4f539ec754",
+    "transfer_to_commercial": "70553cc4-6761-4504-aeed-a746bde7f0f0",
+    "transfer_to_on_call": "5449f02d-f3b1-4c6c-88f4-85b8c1637d2e",
+    "transfer_to_operations": "f7dc7978-61b6-454e-83d7-c4ad392f92ab",
+    "transfer_to_finance": "f55bd36d-4d3b-4b3d-a43e-6145441e83d8"
+  },
+  "phone_numbers": {
+    "ella": {
+      "id": "599594fe-0493-4eeb-b3cc-5a7c930218f5",
+      "number": "+12134640087"
+    }
+  },
+  "kb_files": {}
+}

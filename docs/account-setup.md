@@ -20,7 +20,8 @@ Do them in this order: the first two unblock the first working call.
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon (or "publishable") key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - service_role (or "secret") key → `SUPABASE_SERVICE_ROLE_KEY`
-3. Top bar **Connect** > **Session pooler** > copy the URI, replace `[YOUR-PASSWORD]` with the database password → `SUPABASE_DB_URL`.
+3. Top bar **Connect** > **Session pooler** > copy the URI **as is** (leave `[YOUR-PASSWORD]` in it) → `SUPABASE_DB_URL`.
+4. The database password → `SUPABASE_DB_PASSWORD`. The script fills it into the URI and handles symbols like `@`.
 
 ## 3. Vercel
 1. Sign up at https://vercel.com (Hobby plan; signing in with GitHub is easiest).

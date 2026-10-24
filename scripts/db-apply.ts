@@ -1,5 +1,5 @@
 // Applies supabase/schema.sql to the Supabase database. Idempotent; safe to rerun.
-// Usage: npm run db:apply   (needs SUPABASE_DB_URL in .env)
+// Usage: npm run db:apply   (needs SUPABASE_DB_URL and SUPABASE_DB_PASSWORD in .env)
 
 import "dotenv/config";
 import { readFileSync } from "node:fs";
@@ -7,9 +7,22 @@ import path from "node:path";
 import pg from "pg";
 import { REPO_ROOT } from "../lib/config";
 
+/** The pooler URI with the password filled in and percent-encoded, so symbols like @ are safe. */
+function connectionString(): string {
+  const url = process.env.SUPABASE_DB_URL?.trim();
+  const password = process.env.SUPABASE_DB_PASSWORD;
+  if (!url || !url.startsWith("postgres")) {
+    throw new Error("SUPABASE_DB_URL must be the Session pooler URI (postgresql://...). See docs/account-setup.md.");
+  }
+  if (url.includes("[YOUR-PASSWORD]")) {
+    if (!password) throw new Error("SUPABASE_DB_PASSWORD is not set (the URI still has [YOUR-PASSWORD] in it).");
+    return url.replace("[YOUR-PASSWORD]", encodeURIComponent(password));
+  }
+  return url;
+}
+
 async function main(): Promise<void> {
-  const url = process.env.SUPABASE_DB_URL;
-  if (!url) throw new Error("SUPABASE_DB_URL is not set. Add the Session pooler URI to .env (see docs/account-setup.md).");
+  const url = connectionString();
 
   const sql = readFileSync(path.join(REPO_ROOT, "supabase", "schema.sql"), "utf8");
   const client = new pg.Client({ connectionString: url, ssl: { rejectUnauthorized: false } });

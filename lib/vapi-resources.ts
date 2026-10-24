@@ -17,8 +17,11 @@ import { SECRET_HEADER } from "./constants";
 
 export { SECRET_HEADER };
 
+/** Vapi names are capped at 40 characters, so long labels are shortened to fit the suffix. */
 export function resourceName(c: ClientConfig, label: string): string {
-  return `${label} (${c.client_id}, ${c.environment})`;
+  const suffix = ` (${c.client_id}, ${c.environment === "staging" ? "staging" : "live"})`;
+  const room = 40 - suffix.length;
+  return (label.length > room ? `${label.slice(0, room - 1).trimEnd()}…` : label) + suffix;
 }
 
 /** Query string that tells the webhooks which client config and environment a request is for. */

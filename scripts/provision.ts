@@ -12,7 +12,7 @@
 import "dotenv/config";
 import { loadConfig, transferTargets, type ClientConfig } from "../lib/config";
 import { readState, statePath, writeState, type ProvisionState } from "../lib/state";
-import { VapiClient } from "../lib/vapi";
+import { VapiClient, VapiError } from "../lib/vapi";
 import {
   departmentAssistantBody,
   ellaAssistantBody,
@@ -130,9 +130,19 @@ async function provision(c: ClientConfig, vapi: VapiClient, state: ProvisionStat
   console.log("Phone number");
   if (c.agent.phone.number === "auto") {
     const body = phoneNumberBody(c, ella.id);
-    const phone = await upsert<VapiPhoneNumber>(
-      vapi, "phone-number", state.phone_numbers.ella?.id, body, (p) => p.name === body.name, body.name,
-    );
+    const upsertNumber = (b: Record<string, unknown>) =>
+      upsert<VapiPhoneNumber>(vapi, "phone-number", state.phone_numbers.ella?.id, b, (p) => p.name === body.name, body.name);
+    let phone: VapiPhoneNumber;
+    try {
+      phone = await upsertNumber(body);
+    } catch (err) {
+      // Free numbers run out per area code; Vapi's error suggests ones that are available.
+      const hint = err instanceof VapiError ? err.message.match(/Try one of ([\d, ]+)/) : null;
+      if (!hint) throw err;
+      const fallback = hint[1].split(",")[0].trim();
+      console.log(`  area code ${c.agent.phone.area_code} has no free numbers; using ${fallback} (Vapi's suggestion)`);
+      phone = await upsertNumber({ ...body, numberDesiredAreaCode: fallback });
+    }
     state.phone_numbers.ella = { id: phone.id, number: phone.number ?? state.phone_numbers.ella?.number ?? null };
     if (!dryRun && phone.status && phone.status !== "active") {
       console.log(`  number status is "${phone.status}"; free numbers can take a few minutes to activate. Rerun to record it.`);
@@ -149,7 +159,7 @@ async function main(): Promise<void> {
   const state = readState(config.client_id, config.environment);
 
   console.log(`Provisioning ${config.business.name} (${config.environment})${dryRun ? " [dry run]" : ""}`);
-  console.log(`Webhooks: ${target.baseUrl}/api/vapi/...\n`);
+  console.log(`Webhooks: ${target.baseUrl.replace(/\/$/, "")}/api/vapi/...\n`);
 
   try {
     await provision(config, vapi, state, target);
