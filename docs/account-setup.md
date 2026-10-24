@@ -29,9 +29,9 @@ Do them in this order: the first two unblock the first working call.
 
 ## 4. HubSpot
 1. Sign up for the free CRM at https://www.hubspot.com.
-2. Left sidebar: **Development > Legacy apps > Create legacy app > Private**. Name it `Ella`.
+2. Left sidebar: **Development > Legacy apps**. New accounts can't create legacy apps, so click **Create a service key** (it replaces private apps). Name it `Ella`.
 3. Scopes: `crm.objects.contacts.read`, `crm.objects.contacts.write` and `tickets`. If you also see task or note scopes (`crm.objects.tasks`, `crm.objects.notes`), tick their read and write too.
-4. **Create app**, then on the **Auth** tab click **Show token** and copy it → `HUBSPOT_PRIVATE_APP_TOKEN`.
+4. Create it and copy the key → `HUBSPOT_PRIVATE_APP_TOKEN` (the name is kept from private apps; a service key is used the same way, as a Bearer token).
 
 ## 5. Cal.com
 1. Sign up at https://cal.com. Set your timezone to **America/Chicago** (JR&CO is assumed to be in US Central time).
