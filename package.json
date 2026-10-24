@@ -21,7 +21,10 @@
     "env:vercel": "tsx scripts/env-for-vercel.ts",
     "check": "tsx scripts/check-integrations.ts",
     "seed-demo": "tsx scripts/seed-demo.ts",
-    "test:api": "tsx --test tests/api/*.test.ts"
+    "test:api": "tsx --test tests/api/*.test.ts",
+    "test:personas": "tsx tests/run-tests.ts",
+    "test:ui": "tsx --test tests/ui/*.test.ts",
+    "test": "tsx --test tests/unit/*.test.ts tests/api/*.test.ts tests/ui/*.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

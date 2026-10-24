@@ -1,0 +1,15 @@
+# Persona 2: active leak during business hours, with danger mentioned.
+name: Emergency leak, in hours
+time: "2026-10-27T15:00:00Z"
+opening: "Water is pouring through my bedroom ceiling and the ceiling is starting to sag!"
+caller: |
+  You are Casey Test, stressed but cooperative. Water is coming through your bedroom ceiling
+  and it is sagging. The address is 418 North Sample Street, Evanston, IL 60201.
+  Your number is 847-555-0117. Give the address as soon as you're asked. Confirm your number if asked.
+expect:
+  intent: emergency
+  tools: [send_emergency_alert, transfer_to_on_call]
+  lead_fields: [property_address]
+  actions: [push]
+  empathy: true
+  safety_line: true

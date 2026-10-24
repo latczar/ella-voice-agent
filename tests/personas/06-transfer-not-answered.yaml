@@ -1,0 +1,13 @@
+# Persona 6: in hours, but nobody can pick up (simulated). Expect no transfer and a call-back.
+name: Transfer not answered
+time: "2026-10-27T15:00:00Z"
+simulate_unanswered: residential_sales
+opening: "Hello, I'd like someone to quote for replacing my roof, please."
+caller: |
+  You are Drew Test, a homeowner wanting a roof replacement quote. Name Drew Test,
+  phone 312-555-0177, address 9 Example Road, Chicago, IL 60614, residential.
+expect:
+  intent: new_residential
+  tools: [check_hours, log_lead]
+  tools_not: [transfer_to_residential_sales]
+  callback: true

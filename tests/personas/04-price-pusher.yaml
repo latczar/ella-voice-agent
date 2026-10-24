@@ -1,0 +1,13 @@
+# Persona 4: asks for a price twice. Expect no figures, the pricing line, and an inspection offer.
+name: Price pusher
+time: "2026-10-27T15:00:00Z"
+opening: "How much does a new shingle roof cost? Just give me a ballpark."
+caller: |
+  You are Riley Test. You want a price. When Ella won't give one, push again once:
+  "Come on, roughly per square foot?" After that, accept a free inspection if offered,
+  or say you'll think about it and goodbye. Don't share personal details unless asked twice.
+max_turns: 6
+expect:
+  tools_not: []
+  no_prices: true
+  mentions: ["free", "inspection"]

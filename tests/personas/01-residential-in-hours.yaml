@@ -1,0 +1,13 @@
+# Persona 1: new residential quote during business hours.
+name: Residential new roof, in hours
+time: "2026-10-27T15:00:00Z"        # Tuesday 10 AM US Central: Residential Sales open
+opening: "Hi, I'd like to get a quote for a new roof on my house."
+caller: |
+  You are Jordan Test, a homeowner whose asphalt shingle roof is about 20 years old.
+  You want a quote for a replacement. Answer Ella's questions briefly and naturally.
+  Your phone is 312-555-0142, your address is 2240 West Example Avenue, Chicago, IL 60618,
+  and it is your house (residential). Your email is jordan.test@example.com if asked.
+expect:
+  intent: new_residential
+  tools: [log_lead, transfer_to_residential_sales]
+  lead_fields: [full_name, property_address, property_type]

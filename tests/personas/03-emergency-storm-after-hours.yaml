@@ -1,0 +1,13 @@
+# Persona 3: storm damage at night. Expect an alert AND a transfer attempt (24/7 on-call).
+name: Emergency storm, after hours
+time: "2026-10-28T04:00:00Z"        # Tuesday 11 PM US Central
+opening: "A tree branch came down on my roof in the storm and now there's water getting in."
+caller: |
+  You are Morgan Test. A branch fell on your roof during a storm tonight and rain is getting into the attic.
+  Nobody is hurt and the ceiling looks fine. Address: 77 Demo Court, Oak Park, IL 60302. Phone 773-555-0163.
+expect:
+  intent: emergency
+  tools: [send_emergency_alert, transfer_to_on_call]
+  lead_fields: [property_address]
+  actions: [push]
+  empathy: true

@@ -44,7 +44,7 @@ const check_hours: ToolHandler = async (args, ctx) => {
   if (!key || !dept) {
     return { error: `Unknown department "${key}". Use one of: ${Object.keys(ctx.config.departments).join(", ")}.` };
   }
-  const hours = checkHours(dept.hours, ctx.config.locale.timezone);
+  const hours = checkHours(dept.hours, ctx.config.locale.timezone, ctx.simulatedNow ?? undefined);
   const simulatedUnanswered = ctx.simulateUnanswered.includes(key);
   const canTransfer = hours.open && !simulatedUnanswered;
   return {

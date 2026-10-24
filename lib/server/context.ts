@@ -11,6 +11,8 @@ export interface CallContext {
   isTest: boolean;
   /** Departments to treat as "nobody available" on this call (tests and demos of the fallback). */
   simulateUnanswered: string[];
+  /** Test calls only: the time check_hours should treat as "now" (to test after-hours routing). */
+  simulatedNow: Date | null;
 }
 
 const configs = new Map<string, ClientConfig>();
@@ -45,5 +47,6 @@ export function callContext(config: ClientConfig, message: VapiMessage): CallCon
     channel: isTest && channel === "phone" ? "test" : channel,
     isTest,
     simulateUnanswered: simulated,
+    simulatedNow: isTest && typeof vars.simulate_time === "string" && !Number.isNaN(Date.parse(vars.simulate_time)) ? new Date(vars.simulate_time) : null,
   };
 }
