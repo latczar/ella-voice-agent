@@ -140,6 +140,7 @@ Each has a clear name, a model-facing description saying when to call it, a stri
 - End-of-call reports are deduplicated on the Vapi call ID (Vapi retries webhooks).
 - HubSpot contacts are upserted by email or phone, so repeat callers don't create duplicates.
 - The public dashboard reads only `public_*` views, which show demo and test calls; real callers' details never appear publicly. Base tables have RLS on and no anon access.
+- Call recordings stay with Vapi. The stored link is a private storage URL that doesn't play on its own; listen to a recording in the Vapi dashboard under Call Logs. The public dashboard never shows recordings of real calls.
 - Silence: "Are you still there?" after 10 seconds, then a goodbye and hang-up after 30. Calls are capped at 15 minutes.
 - Secrets live in `.env` and Vercel only. Synthetic data only in tests and seeds.
 
@@ -217,7 +218,7 @@ Vapi bills per minute and passes provider costs through at cost. Every call's ac
 
 Hand-offs to department assistants stay on the same Vapi call, so there is one bill per call, not two.
 
-**Measured:** the first real phone call (an emergency: safety line, alert, lead saved, hand-off to the on-call stand-in) cost **$0.14 for 61 seconds**, so about 14 cents a minute, inside the estimate above. Text test conversations through Vapi's chat API cost about 15 to 25 cents each, counting both Ella and the AI caller (billed per message, not per minute). To re-measure as calls build up: `select avg(cost_usd), avg(duration_s) from calls where channel = 'phone' and not is_demo and not is_test;`
+**Measured:** four real phone calls (two emergencies with a hand-off, an after-hours booking and a billing call) averaged **$0.24 for 79 seconds**, so about **18 cents a minute**: a little above the estimate. Each call includes its tool calls and, where there was a hand-off, the stand-in assistant's time; on a 3-minute call that rate comes to about $0.55. Two browser calls came to about 17 cents a minute. Text test conversations through Vapi's chat API cost about 15 to 25 cents each, counting both Ella and the AI caller (billed per message, not per minute). To re-measure as calls build up: `select avg(cost_usd), avg(duration_s) from calls where channel = 'phone' and not is_demo and not is_test;`
 
 **What live SMS would add:** a US Twilio text is about $0.008 to $0.01 per segment plus carrier fees, so an emergency alert to a three-person dispatch group is about 3 to 5 cents. A2P 10DLC registration adds one-off brand and campaign fees and a small monthly campaign fee. ntfy push, used here, is free.
 
