@@ -32,6 +32,8 @@ create table if not exists calls (
   updated_at      timestamptz not null default now()
 );
 create index if not exists calls_started_at_idx on calls (started_at desc);
+-- Set once the end-of-call report has been handled, so webhook retries are ignored.
+alter table calls add column if not exists report_processed_at timestamptz;
 
 -- Lead captured during a call. log_lead may be called several times per call; the latest wins.
 create table if not exists leads (

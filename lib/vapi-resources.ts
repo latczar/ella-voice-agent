@@ -13,7 +13,9 @@ export interface ServerTarget {
   secret: string;
 }
 
-export const SECRET_HEADER = "x-vapi-secret";
+import { SECRET_HEADER } from "./constants";
+
+export { SECRET_HEADER };
 
 export function resourceName(c: ClientConfig, label: string): string {
   return `${label} (${c.client_id}, ${c.environment})`;

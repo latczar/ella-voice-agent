@@ -9,3 +9,5 @@ node_modules/
 # provisioning state (IDs of created Vapi resources) is committed; secrets never are
 CLAUDE.local.md
 build/
+next-env.d.ts
+*.tsbuildinfo

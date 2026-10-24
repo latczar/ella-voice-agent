@@ -1,0 +1,49 @@
+// Works out who and what a Vapi webhook request is about: which client config,
+// which call, the caller's number, and whether it's a test.
+
+import { loadConfig, type ClientConfig } from "../config";
+
+export interface CallContext {
+  config: ClientConfig;
+  callId: string;
+  callerNumber: string | null;
+  channel: "phone" | "web" | "chat" | "test";
+  isTest: boolean;
+  /** Departments to treat as "nobody available" on this call (tests and demos of the fallback). */
+  simulateUnanswered: string[];
+}
+
+const configs = new Map<string, ClientConfig>();
+
+/** Client config named by the webhook URL (?client=jrco&env=staging), cached per instance. */
+export function configFromUrl(url: string): ClientConfig {
+  const clientId = new URL(url).searchParams.get("client") ?? process.env.CLIENT_ID ?? "jrco";
+  if (!/^[a-z][a-z0-9-]{1,30}$/.test(clientId)) throw new Error(`Invalid client "${clientId}"`);
+  if (!configs.has(clientId)) configs.set(clientId, loadConfig(clientId));
+  return configs.get(clientId)!;
+}
+
+// Loosely typed: Vapi's payloads are large and we read only a few fields.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type VapiMessage = Record<string, any>;
+
+export function callContext(config: ClientConfig, message: VapiMessage): CallContext {
+  const call = message.call ?? {};
+  const vars = { ...(call.assistantOverrides?.variableValues ?? {}), ...(message.chat?.assistantOverrides?.variableValues ?? {}) };
+  const callType: string = call.type ?? "";
+  const channel: CallContext["channel"] = message.chat ? "chat" : callType === "webCall" ? "web" : "phone";
+  const isTest = vars.is_test === true || vars.is_test === "true";
+
+  const simulated = [vars.simulate_unanswered, process.env.SIMULATE_UNANSWERED]
+    .filter((v): v is string => typeof v === "string" && v.length > 0)
+    .flatMap((v) => v.split(",").map((s) => s.trim()));
+
+  return {
+    config,
+    callId: call.id ?? message.chat?.id ?? `unknown-${Date.now()}`,
+    callerNumber: message.customer?.number ?? call.customer?.number ?? null,
+    channel: isTest && channel === "phone" ? "test" : channel,
+    isTest,
+    simulateUnanswered: simulated,
+  };
+}

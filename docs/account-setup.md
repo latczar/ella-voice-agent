@@ -28,20 +28,15 @@ Do them in this order: the first two unblock the first working call.
 
 ## 4. HubSpot
 1. Sign up for the free CRM at https://www.hubspot.com.
-2. Create a private app. Newer accounts: **Development > Legacy apps > Create legacy app > Private**. Older accounts: **Settings > Integrations > Private Apps**. Name it `Ella`.
-3. Scopes (tick each read and write pair you can find):
-   - `crm.objects.contacts` (read, write)
-   - `crm.schemas.contacts` (read, write), so the script can create Ella's custom fields
-   - `crm.objects.deals` (read, write)
-   - `tickets`
-   - `crm.objects.owners.read`
-4. Create, then copy the access token → `HUBSPOT_PRIVATE_APP_TOKEN`.
+2. Left sidebar: **Development > Legacy apps > Create legacy app > Private**. Name it `Ella`.
+3. Scopes: `crm.objects.contacts.read`, `crm.objects.contacts.write` and `tickets`. If you also see task or note scopes (`crm.objects.tasks`, `crm.objects.notes`), tick their read and write too.
+4. **Create app**, then on the **Auth** tab click **Show token** and copy it → `HUBSPOT_PRIVATE_APP_TOKEN`.
 
 ## 5. Cal.com
 1. Sign up at https://cal.com. Set your timezone to **America/Chicago** (JR&CO is assumed to be in US Central time).
 2. **Event Types > New**: title `Free roof inspection`, 60 minutes, location "In person (attendee address)". Save.
 3. Open the event type; the number in the browser address bar is its ID → `CALCOM_EVENT_TYPE_ID`.
-4. **Settings > Developer > API Keys > Add**, no expiry → `CALCOM_API_KEY`.
+4. **Settings > Security > API Keys > Add**, no expiry → `CALCOM_API_KEY` (starts `cal_live_`).
 
 ## 6. Twilio (test credentials only)
 1. Sign up for a trial at https://www.twilio.com (needs phone verification). Don't buy a number.

@@ -6,7 +6,7 @@ import path from "node:path";
 import YAML from "yaml";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
-import schema from "../configs/schema.json" with { type: "json" };
+import schema from "../configs/schema.json";
 
 export type Day = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 export type WeekSchedule = Record<Day, string>; // "HH:MM-HH:MM" | "closed" | "24h"
