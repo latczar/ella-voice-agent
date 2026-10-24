@@ -63,7 +63,7 @@ export function toolSpecs(c: ClientConfig): ToolSpec[] {
           intent: str("The routing intent.", { enum: intentIds }),
           caller_need: str("Caller need category.", { enum: callerNeeds }),
           full_name: str("Caller's full name."),
-          phone: str("Best callback number in E.164, e.g. +13125550101. Use caller ID once the caller confirms it."),
+          phone: str("Only if the caller gave a different number from the one they're calling from, in E.164. Leave empty otherwise: the system adds the caller's number."),
           email: str("Email address, if given."),
           property_address: str("Full property address including city and ZIP, as confirmed with the caller."),
           property_type: str("Residential or commercial property.", { enum: ["residential", "commercial"] }),
@@ -123,11 +123,11 @@ export function toolSpecs(c: ClientConfig): ToolSpec[] {
       parameters: {
         type: "object",
         additionalProperties: false,
-        required: ["start_time", "full_name", "phone", "email", "property_address"],
+        required: ["start_time", "full_name", "email", "property_address"],
         properties: {
           start_time: str("The chosen slot's start time, exactly as returned by check_availability (ISO 8601)."),
           full_name: str("Caller's full name."),
-          phone: str("Caller's confirmed number in E.164."),
+          phone: str("Only if different from the number they're calling from, in E.164."),
           email: str("Caller's email, needed for the booking confirmation.", { format: "email" }),
           property_address: str("Property address for the inspection."),
           notes: str("Anything the inspector should know."),

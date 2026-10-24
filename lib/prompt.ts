@@ -11,7 +11,7 @@ import { transferToolName } from "./tools";
 
 const FIELD_LABELS: Record<LeadField, string> = {
   full_name: "full name",
-  phone: "phone (confirm caller ID)",
+  phone: "phone (the number they're calling from, or one they give)",
   email: "email",
   property_address: "property address",
   property_type: "residential or commercial",
@@ -35,7 +35,6 @@ function template(name: string): HandlebarsTemplateDelegate {
 function vapiVariables(c: ClientConfig) {
   return {
     // Spelled out when there's no number (browser calls), so the model never fills a blank with a guess.
-    callerId: "{% if customer.number %}{{customer.number}}{% else %}NONE on this call (browser call). Ask the caller for their number; never invent one.{% endif %}",
     now: `{{"now" | date: "%A, %B %-d, %Y, %-I:%M %p", "${c.locale.timezone}"}}`,
   };
 }

@@ -77,7 +77,7 @@ const log_lead: ToolHandler = async (args, ctx) => {
     client_id: ctx.config.client_id,
     intent: intent.id,
     caller_need: s(args.caller_need) ?? intent.caller_need,
-    phone: toE164(s(args.phone)),
+    phone: toE164(s(args.phone)) ?? ctx.callerNumber ?? undefined,
     callback_requested: args.callback_requested === true ? true : undefined,
     sms_opt_in: args.sms_opt_in === true ? true : undefined,
   };
