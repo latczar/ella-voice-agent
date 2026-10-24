@@ -113,7 +113,9 @@ export function endCallToolBody() {
 
 // ---- Assistants ----------------------------------------------------------
 
-function voice(c: ClientConfig) {
+function voice(c: ClientConfig, voiceId?: string) {
+  // A department stand-in can have its own voice (so "Mike" doesn't sound like Ella); the version applies to Ella's voice only.
+  if (voiceId && voiceId !== c.voice.voice_id) return { provider: c.voice.provider, voiceId };
   return { provider: c.voice.provider, voiceId: c.voice.voice_id, ...(c.voice.voice_version ? { version: c.voice.voice_version } : {}) };
 }
 
@@ -184,7 +186,7 @@ export function departmentAssistantBody(c: ClientConfig, departmentKey: string, 
       messages: [{ role: "system", content: renderDepartmentPrompt(c, departmentKey) }],
       toolIds: [endCallToolId],
     },
-    voice: voice(c),
+    voice: voice(c, c.departments[departmentKey].persona.voice_id),
     transcriber: transcriber(c),
     backgroundSound: "off",
     maxDurationSeconds: 300,

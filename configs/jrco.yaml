@@ -85,35 +85,35 @@ departments:
     transfer_to: assistant
     transfer_type: warm         # spec: "Cold/Warm"; ASSUMPTION warm
     hours: *standard
-    persona: { name: Sam, greeting: "Residential Sales, this is Sam." }
+    persona: { name: Sam, greeting: "Residential Sales, this is Sam.", voice_id: Elliot }
     after_hours_fallback: [calendar_booking, crm_task]
   commercial:
     name: Commercial Division
     transfer_to: assistant
     transfer_type: warm         # ASSUMPTION: spec doesn't say
     hours: *standard
-    persona: { name: Dana, greeting: "Commercial Division, this is Dana." }
+    persona: { name: Dana, greeting: "Commercial Division, this is Dana.", voice_id: Emma }
     after_hours_fallback: [email_high_priority, crm_task]
   on_call:
     name: On-Call Manager
     transfer_to: assistant
     transfer_type: warm
     hours: *always              # ASSUMPTION: "24/7 On-Call Dispatch" in the spec prompt
-    persona: { name: Mike, greeting: "On-call team, this is Mike." }
+    persona: { name: Mike, greeting: "On-call team, this is Mike.", voice_id: Neil }
     after_hours_fallback: [sms_dispatch, push, crm_task]
   operations:
     name: Operations and Project Management
     transfer_to: assistant
     transfer_type: warm
     hours: *standard
-    persona: { name: Priya, greeting: "Operations, this is Priya." }
+    persona: { name: Priya, greeting: "Operations, this is Priya.", voice_id: Naina }
     after_hours_fallback: [crm_flag, notify_pm]
   finance:
     name: Finance
     transfer_to: assistant
     transfer_type: warm
     hours: *office
-    persona: { name: Leo, greeting: "Finance, this is Leo." }
+    persona: { name: Leo, greeting: "Finance, this is Leo.", voice_id: Leo }
     after_hours_fallback: [crm_billing_queue]
 
 # Routing matrix (spec section 3, plus the gaps we resolved). The system prompt

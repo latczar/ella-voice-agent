@@ -20,7 +20,7 @@ export interface Department {
   transfer_to: "assistant" | string; // "assistant" = in-call hand-off; otherwise an E.164 number
   transfer_type: "warm" | "cold";
   hours: WeekSchedule;
-  persona: { name: string; greeting: string };
+  persona: { name: string; greeting: string; voice_id?: string };
   after_hours_fallback: string[];
 }
 

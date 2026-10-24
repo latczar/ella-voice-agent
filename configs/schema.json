@@ -304,6 +304,10 @@
               },
               "greeting": {
                 "type": "string"
+              },
+              "voice_id": {
+                "type": "string",
+                "description": "Optional Vapi voice for this stand-in; defaults to the agent's voice"
               }
             }
           },
