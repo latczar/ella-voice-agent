@@ -128,7 +128,16 @@ export async function syncToCrm(report: Report, ctx: CallContext, summary: CallS
       .map(([k, v]) => `${k.replace(/_/g, " ")}: ${v}`)
       .join("<br>");
     const transcript = String(report.artifact?.transcript ?? "").slice(0, 20000).replace(/\n/g, "<br>");
-    await addNote(contactId, `<b>Call with ${c.agent.name}</b> (${summary.outcome})<br>${summary.routeReason}<br><br>${fields}<br><br><b>Transcript</b><br>${transcript}`);
+    const details = `<b>Call with ${c.agent.name}</b> (${summary.outcome})<br>${summary.routeReason}<br><br>${fields}<br><br><b>Transcript</b><br>${transcript}`;
+    // Notes may need a scope the key doesn't have; if so, the details ride on the follow-up instead.
+    let noteSaved = true;
+    try {
+      await addNote(contactId, details);
+    } catch (err) {
+      noteSaved = false;
+      await logError("hubspot:note", `Note not saved; details go in the follow-up instead: ${(err as Error).message}`, callId);
+    }
+    const body = (text: unknown) => (noteSaved ? String(text ?? "") : `${String(text ?? "")}<br><br>${details}`);
 
     // Follow-up record, per the routing matrix's after-hours / fallback column.
     const intentId = summary.intent?.id;
@@ -138,23 +147,23 @@ export async function syncToCrm(report: Report, ctx: CallContext, summary: CallS
     let kind: "crm_task" | "crm_ticket" | null = null;
 
     if (summary.intent?.emergency) {
-      recordId = await createTask(contactId, `EMERGENCY: ${who} at ${lead.property_address ?? "address unknown"}`, String(lead.summary ?? summary.routeReason), "HIGH");
+      recordId = await createTask(contactId, `EMERGENCY: ${who} at ${lead.property_address ?? "address unknown"}`, body(lead.summary ?? summary.routeReason), "HIGH");
       kind = "crm_task";
     } else if ((intentId === "billing" || intentId === "supplier_payable") && summary.outcome !== "transferred") {
       const subject = `Billing queue: ${who}${lead.invoice_or_account_number ? `, invoice ${lead.invoice_or_account_number}` : ""}`;
       try {
-        recordId = c.crm.billing_queue === "ticket" ? await createTicket(contactId, subject, String(lead.summary ?? ""), "MEDIUM") : null;
+        recordId = c.crm.billing_queue === "ticket" ? await createTicket(contactId, subject, body(lead.summary), "MEDIUM") : null;
         kind = recordId ? "crm_ticket" : null;
       } catch (err) {
         await logError("hubspot:ticket", `Ticket failed, falling back to a task: ${(err as Error).message}`, callId);
       }
       if (!recordId) {
-        recordId = await createTask(contactId, subject, String(lead.summary ?? ""), "MEDIUM");
+        recordId = await createTask(contactId, subject, body(lead.summary), "MEDIUM");
         kind = "crm_task";
       }
     } else if (summary.outcome !== "transferred" && summary.outcome !== "booked") {
       const priority = intentId === "commercial" || intentId === "existing_customer" ? "HIGH" : "MEDIUM";
-      recordId = await createTask(contactId, `Call back: ${who} (${label})`, String(lead.summary ?? summary.routeReason), priority);
+      recordId = await createTask(contactId, `Call back: ${who} (${label})`, body(lead.summary ?? summary.routeReason), priority);
       kind = "crm_task";
     }
     if (recordId && kind) await recordAction(callId, kind, "ok", { id: recordId });
