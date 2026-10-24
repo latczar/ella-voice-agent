@@ -1,0 +1,27 @@
+{
+  "name": "ella-voice-agent",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Config-driven AI voice receptionist build. First client: JR&CO Roofing (Ella).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "validate": "tsx scripts/validate-config.ts",
+    "render": "tsx scripts/render-prompts.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "dotenv": "^18.0.9",
+    "handlebars": "^4.7.10",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
