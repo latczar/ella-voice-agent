@@ -52,6 +52,21 @@ flowchart LR
   events --> hubspot[HubSpot CRM]
   supa --> dash[Dashboard<br/>same Next.js app]
 ```
+## Stack, and why
+
+| Part | Chose | Why | Instead of (spec suggestion) |
+|---|---|---|---|
+| Voice | **Vapi** + GPT-4o, Deepgram, Vapi voice | Assistants, tools, hand-offs and numbers all set up from code; one bill | Retell, Bland: no clear gain; ElevenLabs: another account |
+| Middleware | **Next.js API routes on Vercel** | Fast, always on, in git, same deploy as the dashboard | n8n: Cloud is a 14-day trial; free self-hosting sleeps and misses mid-call timeouts |
+| Knowledge base | **Markdown, inlined into the prompt** | About 840 words; no lookup delay mid-call | Vector DB / RAG: overkill at this size |
+| Transfers | **Vapi hand-offs** to stand-in team assistants | Real warm transfers on one free number | Phone system / PBX: needs paid numbers; free numbers can't dial abroad |
+| CRM | **HubSpot** (free) | Good API; contact, note, task and ticket per call | AccuLynx, JobNimbus: paid |
+| Calendar | **Cal.com** | Free slots and booking API | Not named in spec |
+| Alerts | **ntfy push** (+ Twilio SMS behind a switch) | Instant, free, real phone alert | Live Twilio SMS: US texts need paid A2P 10DLC registration |
+| Data and dashboard | **Supabase + Next.js** | Free; row-level security keeps real callers private | Not named in spec |
+
+Full reasoning: [architecture](docs/architecture.md#why-each-tool).
+
 One YAML config per client drives the prompts, tools, Vapi assistants and webhooks. [SKILL.md](SKILL.md) rebuilds it for a new client.
 
 ## Read more
