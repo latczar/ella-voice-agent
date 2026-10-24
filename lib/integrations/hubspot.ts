@@ -123,3 +123,8 @@ export async function createTicket(contactId: string, subject: string, content: 
   });
   return res.id;
 }
+
+/** Used by scripts/check-integrations.ts to clean up its synthetic test records. */
+export async function deleteObject(type: "contacts" | "notes" | "tasks" | "tickets", id: string): Promise<void> {
+  await hs("DELETE", `/crm/v3/objects/${type}/${id}`);
+}
