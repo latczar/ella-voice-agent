@@ -5,9 +5,10 @@ import {
   intentLabel, siteInfo,
 } from "@/lib/public-data";
 import TalkToElla from "./talk-to-ella";
-import { Badge, CallTags, OutcomeBadge, PageHead, Stat } from "./ui";
+import { Badge, CallTags, OutcomeBadge, PageHead, Stat, When } from "./ui";
 import CallRow from "./call-row";
 import LiveRefresh from "./live-refresh";
+import { NewBadge, SeenScope } from "./new-rows";
 
 export const dynamic = "force-dynamic";
 
@@ -96,27 +97,32 @@ export default async function Overview() {
           <h2>Recent calls</h2>
           <Link className="link" href="/calls">All calls</Link>
         </div>
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr><th>Time (CT)</th><th>Intent</th><th>Route</th><th>Outcome</th><th className="right">Duration</th><th className="right">Cost</th><th></th></tr>
-            </thead>
-            <tbody>
-              {calls.slice(0, 8).map((x) => (
-                <CallRow key={x.id} id={x.id}>
-                  <td className="nowrap num">{formatWhen(x.started_at, site.timezone)}</td>
-                  <td>{intentLabel(c, x.intent)}</td>
-                  <td className="muted">{departmentName(c, x.route)}</td>
-                  <td><OutcomeBadge outcome={x.outcome} /></td>
-                  <td className="right num">{formatDuration(x.duration_s)}</td>
-                  <td className="right num">{formatCost(x.cost_usd)}</td>
-                  <td className="right"><CallTags isDemo={x.is_demo} isTest={x.is_test} redacted={x.redacted} /></td>
-                </CallRow>
-              ))}
-              {calls.length === 0 && <tr><td colSpan={7} className="empty">No calls yet.</td></tr>}
-            </tbody>
-          </table>
-        </div>
+        <SeenScope scope="overview-calls" ids={calls.slice(0, 8).map((x) => x.id)}>
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th className="col-time">Time (CT)</th><th>Intent</th><th className="hide-sm hide-md">Route</th><th className="col-status">Outcome</th>
+                  <th className="right col-num">Duration</th><th className="right col-num hide-sm">Cost</th><th className="right col-tags hide-sm"><span className="sr-only">Tags</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {calls.slice(0, 8).map((x) => (
+                  <CallRow key={x.id} id={x.id}>
+                    <td className="cell-time"><When iso={x.started_at} timezone={site.timezone} /> <NewBadge id={x.id} /></td>
+                    <td className="cell-main">{intentLabel(c, x.intent)}</td>
+                    <td className="muted hide-sm hide-md">{departmentName(c, x.route)}</td>
+                    <td><OutcomeBadge outcome={x.outcome} /></td>
+                    <td className="right num">{formatDuration(x.duration_s)}</td>
+                    <td className="right num hide-sm">{formatCost(x.cost_usd)}</td>
+                    <td className="right nowrap hide-sm"><CallTags isDemo={x.is_demo} isTest={x.is_test} redacted={x.redacted} /></td>
+                  </CallRow>
+                ))}
+                {calls.length === 0 && <tr><td colSpan={7} className="empty">No calls yet.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </SeenScope>
       </section>
     </main>
   );

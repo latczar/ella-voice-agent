@@ -62,3 +62,23 @@ export function Transcript({ text, agentName }: { text: string; agentName: strin
     </div>
   );
 }
+
+/** A readable timestamp in the client's timezone: "Today 2:45 PM", "Yesterday 9:10 AM", "Oct 21, 4:05 PM". Full date on hover. */
+export function When({ iso, timezone }: { iso: string | null; timezone: string }) {
+  if (!iso) return <span className="faint">—</span>;
+  const d = new Date(iso);
+  const day = (x: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(x);
+  const time = new Intl.DateTimeFormat("en-US", { timeZone: timezone, hour: "numeric", minute: "2-digit" }).format(d);
+  const today = day(new Date());
+  const yesterday = day(new Date(Date.now() - 864e5));
+  const label = day(d) === today ? `Today ${time}`
+    : day(d) === yesterday ? `Yesterday ${time}`
+    : new Intl.DateTimeFormat("en-US", { timeZone: timezone, month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(d);
+  const full = new Intl.DateTimeFormat("en-US", { timeZone: timezone, dateStyle: "full", timeStyle: "short" }).format(d);
+  return <time dateTime={iso} title={full} className="nowrap num">{label}</time>;
+}
+
+/** Placeholder for an empty cell. */
+export function Dash() {
+  return <span className="faint">—</span>;
+}

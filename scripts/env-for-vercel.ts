@@ -7,8 +7,9 @@
 import { config as loadEnv } from "dotenv";
 import { writeFileSync } from "node:fs";
 
-// What the Next.js app reads at runtime. Script-only values (VAPI_PRIVATE_KEY,
-// SUPABASE_DB_URL, SUPABASE_DB_PASSWORD) stay local.
+// What the Next.js app reads at runtime. VAPI_PRIVATE_KEY and DASHBOARD_ADMIN_PASSCODE are
+// only needed for the Tests page's Run tests button. Script-only values (SUPABASE_DB_URL,
+// SUPABASE_DB_PASSWORD) stay local.
 const APP_VARS = [
   "VAPI_WEBHOOK_SECRET",
   "NEXT_PUBLIC_VAPI_PUBLIC_KEY",
@@ -23,6 +24,8 @@ const APP_VARS = [
   "NTFY_SERVER",
   "NTFY_TOPIC",
   "CLIENT_ID",
+  "VAPI_PRIVATE_KEY",
+  "DASHBOARD_ADMIN_PASSCODE",
 ];
 
 const env = loadEnv({ quiet: true }).parsed ?? {};
