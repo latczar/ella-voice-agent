@@ -108,7 +108,8 @@ const EMPATHY = /\b(sorry|understand|that sounds|stressful|frustrating|i hear yo
 const PROCESS = /(inspection|proposal|scope|insurance|installation|warranty)/gi;
 
 function words(s: string): number { return s.trim().split(/\s+/).filter(Boolean).length; }
-function sentences(s: string): number { return s.split(/[.!?]+(?=\s|$)/).filter((x) => x.trim()).length; }
+// Initials such as "J.R." (the spoken business name) are not sentence ends.
+function sentences(s: string): number { return s.replace(/\b(?:[A-Z]\.)+/g, "X").split(/[.!?]+(?=\s|$)/).filter((x) => x.trim()).length; }
 
 /** Runs one persona conversation, checks it and writes its test_results row. Throws on a Vapi or setup failure. */
 export async function runPersona(p: Persona, ctx: HarnessContext): Promise<PersonaResult> {
