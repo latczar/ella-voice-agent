@@ -174,7 +174,7 @@ The six core personas from the brief are written: residential in hours, emergenc
 | Brevity: "2 to 3 sentences" in one place, "under 25 words" in another | Both: under 25 words and at most 3 sentences, except multi-step process explanations |
 | No business hours, timezone, location or transfer numbers | US Central (America/Chicago). Sales, Commercial, Operations: Mon to Fri 7am to 6pm, Sat 8am to noon. Finance: Mon to Fri 8am to 5pm. On-call: 24/7. All in `configs/jrco.yaml` |
 | Locale not stated | Built for the US: US English, US numbers, 911 |
-| Callers from outside the US | Vapi's free numbers are for US use only, and a test call from outside the US was dropped before it reached Vapi. US callers are the expected audience. For international callers, import a Twilio or SIP number into Vapi (a config change plus `npm run provision`). The browser call works from anywhere |
+| Callers from outside the US | Vapi's free numbers are for US use only, and a test call from outside the US was dropped before it reached Vapi. US callers are the expected audience. For international callers, import a Twilio or SIP number into Vapi (provisioning currently creates free Vapi numbers only, so this needs a small change there). The browser call works from anywhere |
 | How "JR&CO" should be pronounced | "J.R. and Co" for the voice; written form unchanged |
 | "On-Call Manager", "On-Call Dispatch team" and "24/7 On-Call Dispatch" used for one role | One on-call manager to transfer to, plus a dispatch group that gets alerts |
 | Emergencies: the prompt says 24/7 warm transfer, the routing table says SMS after hours | Both, 24/7: always alert, always try the transfer |
