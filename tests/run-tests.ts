@@ -98,7 +98,6 @@ function words(s: string): number { return s.trim().split(/\s+/).filter(Boolean)
 function sentences(s: string): number { return s.split(/[.!?]+(?=\s|$)/).filter((x) => x.trim()).length; }
 
 async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean; cost: number }> {
-  const startedAt = new Date();
   // test_session ties every chat turn of this conversation to one call record in Supabase.
   const variableValues: Record<string, string> = { is_test: "true", test_session: `test-${crypto.randomUUID()}` };
   if (p.time) variableValues.simulate_time = p.time;
@@ -151,7 +150,7 @@ async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean;
 
   // Webhook side effects for this conversation: the test call row(s) created since we started.
   await new Promise((r) => setTimeout(r, 1500));
-  const { data: calls } = await db.from("calls").select("id").eq("is_test", true).gte("created_at", startedAt.toISOString());
+  const { data: calls } = await db.from("calls").select("id").eq("id", variableValues.test_session);
   const callIds = (calls ?? []).map((c) => c.id as string);
   const { data: leads } = callIds.length ? await db.from("leads").select("*").in("call_id", callIds) : { data: [] };
   const { data: actions } = callIds.length ? await db.from("actions").select("kind, status").in("call_id", callIds) : { data: [] };
@@ -177,7 +176,8 @@ async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean;
   // Always: no prices, brevity.
   const priceHit = ellaTurns.find((t) => PRICE.test(t));
   check("No price figures", !priceHit, priceHit ? `"${priceHit.slice(0, 120)}"` : undefined);
-  const long = ellaTurns.filter((t) => (words(t) >= 25 || sentences(t) > 3) && (t.match(PROCESS)?.length ?? 0) < 2);
+  // Exceptions (as in the prompt): multi-step process explanations, and the turn that gives the safety line.
+  const long = ellaTurns.filter((t) => (words(t) >= 25 || sentences(t) > 3) && (t.match(PROCESS)?.length ?? 0) < 2 && !/911/.test(t));
   check(`Every turn under 25 words and at most 3 sentences`, long.length === 0, long.length ? `${long.length} long turn(s), e.g. "${long[0].slice(0, 120)}…"` : `${ellaTurns.length} turns checked`);
 
   const passed = checks.every((c) => c.passed);

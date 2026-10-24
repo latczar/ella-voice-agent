@@ -9,5 +9,5 @@ expect:
   intent: emergency
   tools: [send_emergency_alert, transfer_to_on_call]
   lead_fields: [property_address]
-  actions: [push]
+  actions: [sms]                    # the dispatch alert (sms_mode push delivers it by ntfy)
   empathy: true

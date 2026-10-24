@@ -201,7 +201,7 @@ policies:
   empathy:
     in_hours: "I'm so sorry to hear that. Let's get someone out to help secure your property right away."   # spec example
     after_hours: "I'm so sorry to hear that. Let me get our on-call team on this right now."              # spec line overpromises after hours
-  safety_line: "If there's any chance the roof or ceiling could come down, or you see sparks or smell gas, please get everyone out of that area and call 911 first."
+  safety_line: "If anything could come down, or you see sparks or smell gas, get everyone out and call 911 first."
   consent:
     recording: "This call may be recorded for quality."
     sms_opt_in: "Is it okay if we text updates about this to the number you're calling from?"
