@@ -162,6 +162,8 @@ export function ellaAssistantBody(c: ClientConfig, target: ServerTarget, toolIds
     voice: voice(c),
     transcriber: transcriber(c),
     backgroundSound: "off",
+    // Wait a little longer before replying, so a caller who pauses mid-sentence isn't cut off.
+    startSpeakingPlan: { waitSeconds: 0.8 },
     maxDurationSeconds: c.call.max_duration_seconds,
     endCallMessage: c.call.end_call_message,
     hooks: silenceHooks(c),

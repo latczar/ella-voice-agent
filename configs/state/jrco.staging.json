@@ -1,7 +1,7 @@
 {
   "client_id": "jrco",
   "environment": "staging",
-  "updated_at": "2026-10-24T19:13:26.827Z",
+  "updated_at": "2026-10-24T19:19:23.864Z",
   "assistants": {
     "residential_sales": "5d737c71-8bdb-403a-b91e-5d0dce9def09",
     "commercial": "be9c5b63-5d93-47cb-89b5-ec77a3c4b81c",
