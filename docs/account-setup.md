@@ -37,7 +37,7 @@ Do them in this order: the first two unblock the first working call.
 1. Sign up at https://cal.com. Set your timezone to **America/Chicago** (JR&CO is assumed to be in US Central time).
 2. **Event Types > New**: title `Free roof inspection`, 60 minutes, location "In person (attendee address)". Save.
 3. Open the event type; the number in the browser address bar is its ID → `CALCOM_EVENT_TYPE_ID`.
-4. **Settings > Security > API Keys > Add**, no expiry → `CALCOM_API_KEY` (starts `cal_live_`).
+4. **Settings > Developer > API keys > New**, never expires → `CALCOM_API_KEY` (starts `cal_live_`).
 
 ## 6. Twilio (test credentials only)
 1. Sign up for a trial at https://www.twilio.com (needs phone verification). Don't buy a number.
