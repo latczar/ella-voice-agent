@@ -188,7 +188,7 @@ calendar:
   provider: cal_com
   event_type_id_env: CALCOM_EVENT_TYPE_ID
   lookahead_days: 7
-  slots_to_offer: 3
+  slots_to_offer: 2
 
 kb:
   path: kb/jrco
