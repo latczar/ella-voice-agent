@@ -98,6 +98,7 @@ function words(s: string): number { return s.trim().split(/\s+/).filter(Boolean)
 function sentences(s: string): number { return s.split(/[.!?]+(?=\s|$)/).filter((x) => x.trim()).length; }
 
 async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean; cost: number }> {
+  const startedAt = new Date();
   // test_session ties every chat turn of this conversation to one call record in Supabase.
   const variableValues: Record<string, string> = { is_test: "true", test_session: `test-${crypto.randomUUID()}` };
   if (p.time) variableValues.simulate_time = p.time;
@@ -179,6 +180,9 @@ async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean;
   // Exceptions: multi-step process explanations, the safety-line turn, and the spec's own pricing line (23 words).
   const long = ellaTurns.filter((t) => (words(t) >= 25 || sentences(t) > 3) && (t.match(PROCESS)?.length ?? 0) < 2 && !/911|zero-obligation/i.test(t));
   check(`Every turn under 25 words and at most 3 sentences`, long.length === 0, long.length ? `${long.length} long turn(s), e.g. "${long[0].slice(0, 120)}…"` : `${ellaTurns.length} turns checked`);
+
+  // Chats have no end-of-call report, so record what this conversation really cost (both sides) and its transcript.
+  if (callIds.length) await db.from("calls").update({ cost_usd: Number(cost.toFixed(4)), transcript: all, started_at: startedAt.toISOString(), ended_at: new Date().toISOString() }).eq("id", callIds[0]);
 
   const passed = checks.every((c) => c.passed);
   await db.from("test_results").insert({ run_id: runId, persona: p.name, passed, assertions: checks, transcript: all, call_id: callIds[0] ?? ellaChatId ?? null });

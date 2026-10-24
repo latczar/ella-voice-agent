@@ -17,9 +17,11 @@ export default async function Overview() {
 
   const week = calls.filter((x) => x.started_at && Date.now() - Date.parse(x.started_at) < 7 * 864e5);
   const count = (o: string) => week.filter((x) => x.outcome === o).length;
-  const costed = week.filter((x) => x.cost_usd != null);
+  // Prefer calls that really happened (real and test) over the seeded demo figures once there are any.
+  const realFirst = <T,>(xs: T[], isDemo: (x: T) => boolean) => (xs.some((x) => !isDemo(x)) ? xs.filter((x) => !isDemo(x)) : xs);
+  const costed = realFirst(week.filter((x) => x.cost_usd != null), (x) => x.is_demo);
   const avgCost = costed.length ? costed.reduce((s, x) => s + (x.cost_usd ?? 0), 0) / costed.length : null;
-  const timed = week.filter((x) => x.duration_s != null);
+  const timed = realFirst(week.filter((x) => x.duration_s != null), (x) => x.is_demo);
   const avgDuration = timed.length ? Math.round(timed.reduce((s, x) => s + (x.duration_s ?? 0), 0) / timed.length) : null;
 
   return (
