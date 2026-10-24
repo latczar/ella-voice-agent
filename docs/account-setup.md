@@ -2,7 +2,7 @@
 
 Each step ends with what to paste into `.env` (in the repo root; already created, never committed).
 `VAPI_WEBHOOK_SECRET` and `NTFY_TOPIC` are already filled in for you.
-Use a personal email for sign-ups.
+Use latczar@gmail.com for every sign-up.
 
 Do them in this order: the first two unblock the first working call.
 
