@@ -46,6 +46,8 @@ function main(): number {
     console.log(t.via === "handoff" ? `  ok  ${t.key}: in-call hand-off to a stand-in assistant` : `  ok  ${t.key}: phone transfer to ${t.number}`);
   }
 
+  if (config.kb.mode === "vapi") problems.push('kb.mode "vapi" is not implemented in this build; use "prompt" (see scripts/load-kb.ts).');
+
   if (config.alerts.sms_mode === "live") {
     problems.push('alerts.sms_mode "live" needs a registered (A2P 10DLC) Twilio sender, which this build does not have. Use "test" or "push".');
   }

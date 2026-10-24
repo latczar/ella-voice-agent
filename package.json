@@ -12,7 +12,9 @@
     "render": "tsx scripts/render-prompts.ts",
     "typecheck": "tsc --noEmit",
     "test:unit": "tsx --test tests/unit/*.test.ts",
-    "db:apply": "tsx scripts/db-apply.ts"
+    "db:apply": "tsx scripts/db-apply.ts",
+    "provision": "tsx scripts/provision.ts",
+    "load-kb": "tsx scripts/load-kb.ts"
   },
   "dependencies": {
     "ajv": "^8.20.0",
