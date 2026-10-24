@@ -185,7 +185,7 @@ table.table { width: 100%; border-collapse: collapse; }
 
 /* Call panel */
 .call-panel { display: flex; flex-direction: column; gap: 14px; }
-.number { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.number { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 var(--ok); animation: pulse 1.6s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 50%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
 .notice { padding: 10px 12px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); color: var(--text-2); font-size: 13px; }
@@ -195,3 +195,9 @@ table.table { width: 100%; border-collapse: collapse; }
 
 .theme-toggle { width: 34px; padding: 0; justify-content: center; color: var(--text-2); }
 .theme-toggle:hover { color: var(--text); }
+
+.live-pill { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.call-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.call-toolbar .spacer { margin-left: auto; }
+.btn-sm { height: 28px; padding: 0 10px; font-size: 12px; }
+.turn.interim { opacity: 0.6; }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { config, formatWhen, getLeads, intentLabel, siteInfo } from "@/lib/public-data";
+import LiveRefresh from "../live-refresh";
 import { Badge, PageHead } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,7 @@ export default async function LeadsPage() {
       <PageHead
         title="Leads"
         sub="Details Ella captured, as sent to HubSpot. Real callers' details are masked here; demo and test leads are shown in full."
+        right={<LiveRefresh />}
       />
       <section className="card">
         <div className="table-wrap">

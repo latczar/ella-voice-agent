@@ -1,4 +1,4 @@
-import { formatWhen, getLatestTestRun, siteInfo } from "@/lib/public-data";
+import { formatWhen, getLatestPerPersona, siteInfo } from "@/lib/public-data";
 import { Badge, PageHead, Stat, Transcript } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -6,23 +6,23 @@ export const metadata = { title: "Tests · Ella console" };
 
 export default async function TestsPage() {
   const site = siteInfo();
-  const results = await getLatestTestRun();
-  const run = results[0];
+  const results = await getLatestPerPersona();
   const passed = results.filter((r) => r.passed).length;
+  const lastTested = results.reduce<string | null>((max, r) => (!max || r.started_at > max ? r.started_at : max), null);
 
   return (
     <main className="page">
       <PageHead
         title="Tests"
-        sub="Automated caller personas run against the staging assistant. Each result shows its assertions and the transcript as evidence."
+        sub="An AI caller plays each scenario against the staging assistant, by text. Each scenario shows its latest result, the checks and the transcript as evidence."
       />
-      {!run ? (
+      {!results.length ? (
         <section className="card"><div className="empty">No test runs yet.</div></section>
       ) : (
         <>
           <div className="stats" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))", marginBottom: 16 }}>
-            <Stat label="Latest run" value={<span style={{ fontSize: 16 }}>{formatWhen(run.started_at, site.timezone)} CT</span>} />
-            <Stat label="Personas passed" value={`${passed} / ${results.length}`} />
+            <Stat label="Last tested" value={<span style={{ fontSize: 16 }}>{formatWhen(lastTested, site.timezone)} CT</span>} />
+            <Stat label="Scenarios passing" value={`${passed} / ${results.length}`} />
             <Stat label="Result" value={passed === results.length ? <Badge tone="ok">All passed</Badge> : <Badge tone="bad">{results.length - passed} failed</Badge>} />
           </div>
           <div className="grid">
@@ -31,7 +31,7 @@ export default async function TestsPage() {
                 <summary className="card-head" style={{ cursor: "pointer", listStyle: "none" }}>
                   <h2>{r.persona}</h2>
                   <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <span className="faint num">{r.assertions.filter((a) => a.passed).length}/{r.assertions.length} checks</span>
+                    <span className="faint num">{formatWhen(r.started_at, site.timezone)} · {r.assertions.filter((a) => a.passed).length}/{r.assertions.length} checks</span>
                     {r.passed ? <Badge tone="ok">Pass</Badge> : <Badge tone="bad">Fail</Badge>}
                   </span>
                 </summary>

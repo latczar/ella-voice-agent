@@ -1,6 +1,7 @@
 import { config, departmentName, formatCost, formatDuration, formatWhen, getCalls, intentLabel, siteInfo } from "@/lib/public-data";
 import CallRow from "../call-row";
 import { CallTags, OutcomeBadge, PageHead } from "../ui";
+import LiveRefresh from "../live-refresh";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Calls · Ella console" };
@@ -11,7 +12,7 @@ export default async function CallsPage() {
   const calls = await getCalls(200);
   return (
     <main className="page">
-      <PageHead title="Calls" sub="Every call Ella has handled, newest first. Times are US Central." />
+      <PageHead title="Calls" sub="Every call Ella has handled, newest first. Times are US Central." right={<LiveRefresh />} />
       <section className="card">
         <div className="table-wrap">
           <table className="table">

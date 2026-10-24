@@ -7,6 +7,7 @@ import {
 import TalkToElla from "./talk-to-ella";
 import { Badge, CallTags, OutcomeBadge, PageHead, Stat } from "./ui";
 import CallRow from "./call-row";
+import LiveRefresh from "./live-refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export default async function Overview() {
       <PageHead
         title="Overview"
         sub={`${site.agentName} answers every call to ${site.businessName}, 24/7: questions, lead capture, transfers, bookings and emergency alerts.`}
+        right={<LiveRefresh />}
       />
 
       <div className="grid grid-2" style={{ marginBottom: 16 }} id="talk">

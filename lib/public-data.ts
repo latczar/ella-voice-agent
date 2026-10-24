@@ -134,6 +134,14 @@ export async function getLatestTestRun(): Promise<TestResultRow[]> {
   return select<TestResultRow>("public_test_results", (q) => q.select("*").eq("run_id", latest[0].run_id).order("persona"));
 }
 
+/** Each persona's most recent result, whichever run it came from (so a one-persona rerun doesn't hide the rest). */
+export async function getLatestPerPersona(): Promise<TestResultRow[]> {
+  const rows = await select<TestResultRow>("public_test_results", (q) => q.select("*").order("started_at", { ascending: false }).limit(300));
+  const latest = new Map<string, TestResultRow>();
+  for (const r of rows) if (!latest.has(r.persona)) latest.set(r.persona, r);
+  return [...latest.values()].sort((a, b) => a.persona.localeCompare(b.persona));
+}
+
 // ---- Formatting ------------------------------------------------------------
 
 export function formatUsNumber(e164: string | null): string {
