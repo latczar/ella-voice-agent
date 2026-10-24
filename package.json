@@ -17,7 +17,8 @@
     "load-kb": "tsx scripts/load-kb.ts",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "env:vercel": "tsx scripts/env-for-vercel.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
