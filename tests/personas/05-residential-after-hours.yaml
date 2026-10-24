@@ -1,9 +1,9 @@
 # Persona 5: residential enquiry at night. Expect a Cal.com booking (or a logged call-back), no transfer.
 name: Residential, after hours
 time: "2026-10-28T02:00:00Z"        # Monday 9 PM US Central: sales closed
-opening: "Hi, I think a few shingles blew off my roof. Can someone come and take a look?"
+opening: "Hi, my roof is getting old and I'd like someone to look at it for a quote."   # not storm damage, which routes as an emergency
 caller: |
-  You are Avery Test. A few shingles are missing after wind; no leak. You'd like an inspection.
+  You are Avery Test. Your roof is about 25 years old; no leaks or damage. You'd like an inspection for a replacement quote.
   Accept the first time Ella offers. Name Avery Test, phone 630-555-0109,
   email avery.test@example.com, address 15 Sample Lane, Naperville, IL 60540, residential.
 expect:

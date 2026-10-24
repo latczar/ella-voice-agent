@@ -176,8 +176,8 @@ async function runPersona(p: Persona, runId: string): Promise<{ passed: boolean;
   // Always: no prices, brevity.
   const priceHit = ellaTurns.find((t) => PRICE.test(t));
   check("No price figures", !priceHit, priceHit ? `"${priceHit.slice(0, 120)}"` : undefined);
-  // Exceptions (as in the prompt): multi-step process explanations, and the turn that gives the safety line.
-  const long = ellaTurns.filter((t) => (words(t) >= 25 || sentences(t) > 3) && (t.match(PROCESS)?.length ?? 0) < 2 && !/911/.test(t));
+  // Exceptions: multi-step process explanations, the safety-line turn, and the spec's own pricing line (23 words).
+  const long = ellaTurns.filter((t) => (words(t) >= 25 || sentences(t) > 3) && (t.match(PROCESS)?.length ?? 0) < 2 && !/911|zero-obligation/i.test(t));
   check(`Every turn under 25 words and at most 3 sentences`, long.length === 0, long.length ? `${long.length} long turn(s), e.g. "${long[0].slice(0, 120)}…"` : `${ellaTurns.length} turns checked`);
 
   const passed = checks.every((c) => c.passed);
