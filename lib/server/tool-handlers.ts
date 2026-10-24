@@ -170,7 +170,9 @@ const book_appointment: ToolHandler = async (args, ctx) => {
   const phone = toE164(s(args.phone)) ?? ctx.callerNumber ?? undefined;
   const booking = await createBooking({
     eventTypeId: eventTypeId(c.calendar.event_type_id_env),
-    start, name, email, phone, address, timeZone: c.locale.timezone, notes: s(args.notes), callId: ctx.callId,
+    // Cal.com rejects addresses that can't receive mail, so test calls (synthetic @example.com
+    // addresses) book against a throwaway public inbox. The lead keeps the address given.
+    start, name, email: ctx.isTest ? "jrco-ella-tests@mailinator.com" : email, phone, address, timeZone: c.locale.timezone, notes: s(args.notes), callId: ctx.callId,
   });
   await touchCall(ctx, { outcome: "booked" });
   await mergeLead({ call_id: ctx.callId, client_id: c.client_id, full_name: name, email, phone, property_address: address });
