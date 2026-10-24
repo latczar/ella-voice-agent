@@ -19,8 +19,12 @@ export interface CallSummary {
 
 /** Department key of the hand-off Ella made, if any (from the transfer_to_<dept> tool calls). */
 function handedOffTo(report: Report, config: ClientConfig): string | null {
-  const text = JSON.stringify(report.artifact?.messages ?? report.messages ?? []);
-  const keys = [...text.matchAll(/transfer_to_([a-z_]+)/g)].map((m) => m[1]).filter((k) => k in config.departments);
+  // Only tools Ella actually called: the system prompt also names every transfer tool, so searching the whole
+  // message log would find one on every call.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const messages: any[] = report.artifact?.messages ?? report.messages ?? [];
+  const called = messages.flatMap((m) => [...(m.toolCalls ?? []), ...(m.tool_calls ?? [])]).map((t) => String(t?.function?.name ?? ""));
+  const keys = called.map((n) => /^transfer_to_([a-z_]+)$/.exec(n)?.[1]).filter((k): k is string => !!k && k in config.departments);
   return keys.at(-1) ?? null;
 }
 

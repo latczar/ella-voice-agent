@@ -175,6 +175,16 @@ describe(`webhooks at ${BASE}`, () => {
       const { json } = await post("events", report);
       assert.equal(json.duplicate, true);
     });
+    test("transfer tools named only in the system prompt don't count as a hand-off", async () => {
+      const { json } = await post("events", {
+        message: {
+          ...report.message,
+          call: call(`${id}-nohandoff`),
+          artifact: { transcript: "AI: Booked.", messages: [{ role: "system", message: "Tools: transfer_to_finance, transfer_to_on_call" }] },
+        },
+      });
+      assert.notEqual(json.outcome, "transferred");
+    });
     test("other server messages are acknowledged", async () => {
       const { status } = await post("events", { message: { type: "status-update", status: "in-progress" } });
       assert.equal(status, 200);
