@@ -2,13 +2,40 @@
 
 Ella answers every call to JR&CO Roofing, a fictional US residential and commercial roofer, 24/7. She answers questions about roofing systems and the process, captures the caller's details, and routes the call: a warm transfer to the right team, a free inspection booking, an emergency alert to the on-call team, or a logged call-back.
 
+## Demo
+
+Real calls to Ella. Click a picture to play.
+
+<table>
+  <tr>
+    <td align="center" colspan="3">
+      <a href="docs/demo/browser-call.mp4"><img src="docs/demo/browser-call.jpg" width="720" alt="Browser call: new roof enquiry and booking, then the dashboard and HubSpot record"></a><br>
+      <b>▶ Browser call</b>: roof quote and booking, live on the dashboard, then the HubSpot record
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <a href="docs/demo/phone-emergency.mp4"><img src="docs/demo/phone-emergency.jpg" width="200" alt="Phone call: emergency roof leak"></a><br>
+      <b>▶ Emergency</b>: alert arrives mid-call, hand-off to on-call
+    </td>
+    <td align="center" width="33%">
+      <a href="docs/demo/phone-booking.mp4"><img src="docs/demo/phone-booking.jpg" width="200" alt="Phone call: after-hours inspection booking"></a><br>
+      <b>▶ After hours</b>: free inspection booked
+    </td>
+    <td align="center" width="33%">
+      <a href="docs/demo/phone-billing.mp4"><img src="docs/demo/phone-billing.jpg" width="200" alt="Phone call: billing question"></a><br>
+      <b>▶ Billing</b>: billing ticket raised for Finance
+    </td>
+  </tr>
+</table>
+
 This repo is not a one-off agent. It is a **config-driven, tested build process**, and Ella is its first client. A new client is a new YAML file plus a knowledge-base folder; the prompts, tools, Vapi resources and webhooks are all generated or driven from that config. See [SKILL.md](SKILL.md) to build one for another client.
 
 | | |
 |---|---|
 | Call Ella | **+1 (213) 464-0087** (US number; call from a US phone. From outside the US, use the browser) |
 | Dashboard and "Talk to Ella" in the browser | https://ella-voice-agent.vercel.app |
-| Demo video | _link to come (Lat to add)_ |
+| Demo videos | [Four real calls](#demo) |
 | Status page | _optional, not set up_ |
 
 All data in this project is synthetic. Please don't give Ella real personal details.
