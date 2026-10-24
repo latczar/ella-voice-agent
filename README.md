@@ -172,7 +172,7 @@ Each has a clear name, a model-facing description saying when to call it, a stri
 | "Push notification" has no channel | ntfy |
 | "Notify assigned Project Manager" but no PM directory | A push naming the PM, plus a high-priority HubSpot task |
 | Commercial after hours: "high-priority email" | No email service in this build; a high-priority HubSpot task instead (HubSpot can email the owner) |
-| Live SMS | Not done. US A2P 10DLC registration needs a paid Twilio account and brand and campaign approval; unregistered texts are blocked (error 30034). `sms_mode: test` uses Twilio test credentials; `push` delivers alerts to a phone via ntfy |
+| Live SMS | Not done. US A2P 10DLC registration needs a paid Twilio account and brand and campaign approval; unregistered texts are blocked (error 30034). `sms_mode: push` (used here) delivers the dispatch text to a phone via ntfy. `sms_mode: test` (Twilio test credentials) is built but **not exercised**: Twilio's sign-up phone verification wouldn't accept the developer's numbers, so no test credentials could be issued. `npm run check` skips Twilio when its keys are absent |
 | Middleware suggested (n8n etc.) | Webhooks in code, for the reasons above |
 | Vector DB or custom RAG suggested | Markdown in the prompt, for the reasons above |
 | Live transfer via the phone system / PBX | Vapi hand-offs. Vapi's free plan has one number and free numbers can't dial out, so each department is a stand-in assistant that answers as that team. A department can be set to a real number in the config; provisioning then builds a phone transfer with an unanswered-call fallback (`warm-transfer-experimental`) |
