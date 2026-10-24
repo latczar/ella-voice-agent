@@ -8,7 +8,8 @@ let client: SupabaseClient | null | undefined;
 
 export function db(): SupabaseClient | null {
   if (client !== undefined) return client;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // Accept the URL with or without a pasted "/rest/v1/" suffix.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   client = url && key ? createClient(url, key, { auth: { persistSession: false } }) : null;
   if (!client) console.warn("Supabase is not configured (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY); nothing will be stored.");

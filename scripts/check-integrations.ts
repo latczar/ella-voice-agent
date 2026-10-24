@@ -36,7 +36,7 @@ async function main(): Promise<void> {
   await check("Supabase", ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"], async () => {
     const { db } = await import("../lib/server/db");
     const { count, error } = await db()!.from("calls").select("id", { count: "exact", head: true });
-    if (error) throw new Error(`${error.message} (has npm run db:apply been run?)`);
+    if (error || count === null) throw new Error(`${error?.message ?? "no response from the calls table"} (check the Supabase URL, and that npm run db:apply has run)`);
     return `connected; ${count ?? 0} calls stored`;
   });
 
