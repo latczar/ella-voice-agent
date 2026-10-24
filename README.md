@@ -8,7 +8,7 @@ This repo is not a one-off agent. It is a **config-driven, tested build process*
 |---|---|
 | Call Ella | **+1 (213) 464-0087** (US number) |
 | Dashboard and "Talk to Ella" in the browser | https://ella-voice-agent.vercel.app |
-| Demo video | _to come_ |
+| Demo video | _link to come (Lat to add)_ |
 | Status page | _optional, not set up_ |
 
 All data in this project is synthetic. Please don't give Ella real personal details.
@@ -195,17 +195,47 @@ The six core personas from the brief are written: residential in hours, emergenc
 | "Notify assigned Project Manager" but no PM directory | A push naming the PM, plus a high-priority HubSpot task |
 | Commercial after hours: "high-priority email" | No email service in this build; a high-priority HubSpot task instead (HubSpot can email the owner) |
 | Live SMS | Not done. US A2P 10DLC registration needs a paid Twilio account and brand and campaign approval; unregistered texts are blocked (error 30034). `sms_mode: push` (used here) delivers the dispatch text to a phone via ntfy. `sms_mode: test` (Twilio test credentials) is built but **not exercised**: Twilio's sign-up phone verification wouldn't accept the developer's numbers, so no test credentials could be issued. `npm run check` skips Twilio when its keys are absent |
+| Brevity rule vs the spec's own lines | Two allowed exceptions to the 25-word rule: the emergency safety-line turn (leave the area, call 911) and the spec's 23-word pricing line when followed by the inspection offer. The persona checks allow both |
+| Test calls make real Cal.com bookings | On test calls (`is_test`), `book_appointment` swaps the attendee email for a throwaway public inbox (`lib/server/tool-handlers.ts`), so booking checks run end to end without emailing anyone |
 | Middleware suggested (n8n etc.) | Webhooks in code, for the reasons above |
 | Vector DB or custom RAG suggested | Markdown in the prompt, for the reasons above |
 | Live transfer via the phone system / PBX | Vapi hand-offs. Vapi's free plan has one number and free numbers can't dial out, so each department is a stand-in assistant that answers as that team. A department can be set to a real number in the config; provisioning then builds a phone transfer with an unanswered-call fallback (`warm-transfer-experimental`) |
 
 ## Cost per call
 
-_To be filled in from measured calls (each call's cost is stored from Vapi's end-of-call report)._
+Vapi bills per minute and passes provider costs through at cost. Every call's actual total is stored in `calls.cost_usd` from Vapi's end-of-call report and shown on the dashboard.
+
+| Part | Rate (USD per minute) | Notes |
+|---|---|---|
+| Vapi platform fee | $0.05 | Flat, published |
+| Speech-to-text (Deepgram Nova-3) | about $0.01 | Via Vapi |
+| Voice (Vapi Savannah) | about $0.02 | Via Vapi |
+| GPT-4o | about $0.04 to $0.07 | The prompt plus inlined KB is about 16,600 characters (around 4,000 tokens, 5,500 with tool schemas), resent on every turn; four to five turns a minute |
+| Telephony (free Vapi US number, inbound) | about $0.01 | |
+| **Total** | **about $0.13 to $0.16 per minute** | A typical 3-minute call is **about $0.40 to $0.50** |
+
+Hand-offs to department assistants stay on the same Vapi call, so there is one bill per call, not two.
+
+**Measured so far:** one persona conversation through Vapi's chat API cost $0.26, counting both Ella and the AI caller (chat is billed per message, not per minute, so this is not a phone-call figure). _Replace with the average of real phone calls once there are some: `select avg(cost_usd), avg(duration_s) from calls where channel = 'phone' and not is_demo and not is_test;`_
+
+**What live SMS would add:** a US Twilio text is about $0.008 to $0.01 per segment plus carrier fees, so an emergency alert to a three-person dispatch group is about 3 to 5 cents. A2P 10DLC registration adds one-off brand and campaign fees and a small monthly campaign fee. ntfy push, used here, is free.
 
 ## What was prioritised, and what was cut
 
-_To be completed at the end of the timebox._
+The brief asks for a working core over polish, so the tiers were built in order and each was working before the next began.
+
+**Prioritised**
+- **The working core first:** Ella on a real number and in the browser, the config file and schema, the prompt templates, the in-call tools, the webhooks, and an idempotent provisioning script. Everything is created from code; nothing was clicked together in a dashboard.
+- **Safety and routing over breadth:** emergencies (safety line, 24/7 alert plus transfer), never quoting prices, and the unanswered-transfer fallback were built and tested before anything cosmetic.
+- **Tests that read real outcomes:** the persona harness checks the database (leads, alerts, bookings), not just the transcript, and its results show on the dashboard.
+- **Spec gaps written down** as they were found, rather than left until the end.
+
+**Cut or reduced**
+- **Twilio SMS:** Twilio's sign-up phone verification would not accept the developer's numbers, so no test credentials could be issued. The `test` SMS mode is built but not exercised; alerts go by ntfy push (`sms_mode: push`). Live SMS was never planned (A2P 10DLC, see gaps).
+- **Personas 07 to 14** (commercial, existing customer, billing, supplier, refuser, unclear address, off-topic, prompt injection): the behaviour is in the prompt and routing, but only the six core personas have automated runs. Each run costs Vapi credit, so runs were kept to what proved the core.
+- **Real phone transfers:** stand-in department assistants via Vapi hand-offs instead, as the free number cannot dial out. A real number can be set per department in the config.
+- **Email:** no email service; high-priority HubSpot tasks instead.
+- **BetterStack monitor and status page:** optional (Could tier). `/api/health` is ready for one.
 
 ## Adding a new client
 
