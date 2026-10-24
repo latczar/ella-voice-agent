@@ -153,3 +153,10 @@ create or replace view public_test_results with (security_invoker = false) as
 
 revoke all on calls, leads, actions, errors, test_runs, test_results from anon, authenticated;
 grant select on public_calls, public_leads, public_actions, public_health, public_errors, public_test_results to anon, authenticated;
+
+-- Explicit grants, so this works with "Automatically expose new tables" switched off
+-- (recommended): the service role (webhooks, scripts) gets full access to the tables;
+-- anon only gets the public_* views granted above.
+grant usage on schema public to anon, authenticated, service_role;
+grant select, insert, update, delete on calls, leads, actions, errors, test_runs, test_results to service_role;
+grant select on public_calls, public_leads, public_actions, public_health, public_errors, public_test_results to service_role;
