@@ -7,3 +7,4 @@ node_modules/
 *.log
 .DS_Store
 # provisioning state (IDs of created Vapi resources) is committed; secrets never are
+CLAUDE.local.md
