@@ -41,7 +41,7 @@ function server(c: ClientConfig, target: ServerTarget, route: string, timeoutSec
 
 export function functionToolBody(c: ClientConfig, spec: ToolSpec, target: ServerTarget) {
   const messages: object[] = [];
-  if (spec.saysWhileRunning) messages.push({ type: "request-start", content: spec.saysWhileRunning, blocking: false });
+  if (spec.saysWhileRunning !== undefined) messages.push({ type: "request-start", content: spec.saysWhileRunning, blocking: false });
   messages.push({ type: "request-failed", content: spec.saysOnFailure });
   return {
     type: "function",

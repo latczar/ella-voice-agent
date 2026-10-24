@@ -19,7 +19,7 @@ export interface ToolSpec {
   name: string;
   description: string;
   parameters: JsonSchema;
-  /** Spoken while the tool runs (only for tools that may take a moment). */
+  /** Spoken while the tool runs (only for tools that may take a moment). "" = say nothing, overriding Vapi's default filler. */
   saysWhileRunning?: string;
   /** Spoken if the tool fails or times out, so the caller never hears silence. */
   saysOnFailure: string;
@@ -47,6 +47,7 @@ export function toolSpecs(c: ClientConfig): ToolSpec[] {
         required: ["department"],
         properties: { department: str("The department the caller needs.", { enum: departmentKeys }) },
       },
+      saysWhileRunning: "", // instant; no filler
       saysOnFailure: "Let me take your details and make sure the right person calls you back.",
       timeoutSeconds: 10,
     },
@@ -77,6 +78,7 @@ export function toolSpecs(c: ClientConfig): ToolSpec[] {
           summary: str("One or two sentences on what the caller needs, for the team's notes."),
         },
       },
+      saysWhileRunning: "", // instant; no filler
       saysOnFailure: "I've made a note of that.",
       timeoutSeconds: 10,
     },
