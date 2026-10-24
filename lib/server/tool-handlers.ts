@@ -109,8 +109,13 @@ const send_emergency_alert: ToolHandler = async (args, ctx) => {
   const c = ctx.config;
   const text = `${c.business.short_name} EMERGENCY: ${summary}. Address: ${address}. Call back ${name} on ${callback}.${danger ? " DANGER REPORTED: caller told to leave the area and call 911." : ""}`;
 
-  await touchCall(ctx, { intent: c.intents.find((i) => i.emergency)?.id ?? "emergency", route: c.intents.find((i) => i.emergency)?.department });
-  await mergeLead({ call_id: ctx.callId, client_id: c.client_id, property_address: address, urgency: "emergency", phone: toE164(s(args.callback_number)), full_name: s(args.caller_name), summary });
+  // Save the emergency as a lead here too, so it's on record even if log_lead is never called.
+  const emergencyIntent = c.intents.find((i) => i.emergency);
+  await touchCall(ctx, { intent: emergencyIntent?.id ?? "emergency", route: emergencyIntent?.department });
+  await mergeLead({
+    call_id: ctx.callId, client_id: c.client_id, intent: emergencyIntent?.id ?? "emergency", property_address: address, urgency: "emergency",
+    phone: toE164(s(args.callback_number)) ?? ctx.callerNumber ?? undefined, full_name: s(args.caller_name), summary,
+  });
 
   // Text the dispatch group and push, in parallel; both are quick.
   const topic = process.env[c.alerts.push.topic_env] ?? "";

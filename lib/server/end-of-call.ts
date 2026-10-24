@@ -33,8 +33,9 @@ async function actionKinds(callId: string): Promise<Set<string>> {
 
 export async function summarise(report: Report, ctx: CallContext, lead: LeadRow | null): Promise<CallSummary> {
   const c = ctx.config;
-  const intent = c.intents.find((i) => i.id === lead?.intent);
   const transferredTo = handedOffTo(report, c);
+  // No intent logged (log_lead skipped): fall back to the intent that routes to the team the caller was handed to.
+  const intent = c.intents.find((i) => i.id === lead?.intent) ?? (transferredTo ? c.intents.find((i) => i.department === transferredTo) : undefined);
   const done = await actionKinds(ctx.callId);
   const endedReason: string = report.endedReason ?? "";
 
@@ -70,10 +71,12 @@ export async function summarise(report: Report, ctx: CallContext, lead: LeadRow 
  * which happens on calls that end in a hand-off. (The public views hide it for real calls.)
  */
 function plainSummary(summary: CallSummary, lead: LeadRow | null, done: Set<string>): string {
-  const who = [lead?.full_name, lead?.property_address ? `at ${lead.property_address}` : null].filter(Boolean).join(" ");
+  const who = [lead?.full_name, lead?.property_address ? `${lead?.full_name ? "at " : ""}${lead.property_address}` : null].filter(Boolean).join(" ");
   const parts = [
     `${summary.intent?.label ?? "Call"}${who ? `: ${who}` : ""}.`,
-    typeof lead?.summary === "string" && lead.summary ? `${lead.summary.replace(/\.?\s*$/, ".")}` : null,
+    typeof lead?.summary === "string" && lead.summary && lead.summary.toLowerCase() !== summary.intent?.label.toLowerCase()
+      ? `${lead.summary.replace(/\.?\s*$/, ".")}`
+      : null,
     summary.routeReason,
     summary.intent?.emergency && (done.has("sms") || done.has("push")) && summary.outcome !== "sms_sent" ? "Emergency alert sent to on-call dispatch." : null,
   ];
