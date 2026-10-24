@@ -106,7 +106,7 @@ export function loadConfig(clientId: string): ClientConfig {
     throw new ConfigError(file, problems);
   }
 
-  const config = raw as ClientConfig;
+  const config = raw as unknown as ClientConfig; // shape guaranteed by the schema check above
   const problems = crossCheck(config);
   if (problems.length) throw new ConfigError(file, problems);
   return config;
