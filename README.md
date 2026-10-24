@@ -217,7 +217,7 @@ Vapi bills per minute and passes provider costs through at cost. Every call's ac
 
 Hand-offs to department assistants stay on the same Vapi call, so there is one bill per call, not two.
 
-**Measured so far:** one persona conversation through Vapi's chat API cost $0.26, counting both Ella and the AI caller (chat is billed per message, not per minute, so this is not a phone-call figure). _Replace with the average of real phone calls once there are some: `select avg(cost_usd), avg(duration_s) from calls where channel = 'phone' and not is_demo and not is_test;`_
+**Measured:** the first real phone call (an emergency: safety line, alert, lead saved, hand-off to the on-call stand-in) cost **$0.14 for 61 seconds**, so about 14 cents a minute, inside the estimate above. Text test conversations through Vapi's chat API cost about 15 to 25 cents each, counting both Ella and the AI caller (billed per message, not per minute). To re-measure as calls build up: `select avg(cost_usd), avg(duration_s) from calls where channel = 'phone' and not is_demo and not is_test;`
 
 **What live SMS would add:** a US Twilio text is about $0.008 to $0.01 per segment plus carrier fees, so an emergency alert to a three-person dispatch group is about 3 to 5 cents. A2P 10DLC registration adds one-off brand and campaign fees and a small monthly campaign fee. ntfy push, used here, is free.
 

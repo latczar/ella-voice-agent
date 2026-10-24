@@ -65,6 +65,21 @@ export async function summarise(report: Report, ctx: CallContext, lead: LeadRow 
   return { intent, route: transferredTo ?? intent?.department ?? null, outcome, routeReason };
 }
 
+/**
+ * Plain summary built from what the call recorded. Used when Vapi sends no summary of its own,
+ * which happens on calls that end in a hand-off. (The public views hide it for real calls.)
+ */
+function plainSummary(summary: CallSummary, lead: LeadRow | null, done: Set<string>): string {
+  const who = [lead?.full_name, lead?.property_address ? `at ${lead.property_address}` : null].filter(Boolean).join(" ");
+  const parts = [
+    `${summary.intent?.label ?? "Call"}${who ? `: ${who}` : ""}.`,
+    typeof lead?.summary === "string" && lead.summary ? `${lead.summary.replace(/\.?\s*$/, ".")}` : null,
+    summary.routeReason,
+    summary.intent?.emergency && (done.has("sms") || done.has("push")) && summary.outcome !== "sms_sent" ? "Emergency alert sent to on-call dispatch." : null,
+  ];
+  return parts.filter(Boolean).join(" ");
+}
+
 function durationSeconds(report: Report): number | null {
   const start = Date.parse(report.startedAt ?? report.call?.startedAt ?? "");
   const end = Date.parse(report.endedAt ?? report.call?.endedAt ?? "");
@@ -97,7 +112,7 @@ export async function storeCall(report: Report, ctx: CallContext): Promise<{ fre
     cost_usd: typeof report.cost === "number" ? report.cost : null,
     recording_url: report.artifact?.recordingUrl ?? report.recordingUrl ?? null,
     transcript: report.artifact?.transcript ?? report.transcript ?? null,
-    summary: report.analysis?.summary ?? report.summary ?? null,
+    summary: report.analysis?.summary || report.summary || plainSummary(summary, lead, await actionKinds(ctx.callId)),
     is_test: ctx.isTest,
     report_processed_at: new Date().toISOString(),
   });

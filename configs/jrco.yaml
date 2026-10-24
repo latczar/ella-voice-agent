@@ -99,7 +99,7 @@ departments:
     transfer_to: assistant
     transfer_type: warm
     hours: *always              # ASSUMPTION: "24/7 On-Call Dispatch" in the spec prompt
-    persona: { name: Mike, greeting: "On-call, this is Mike." }
+    persona: { name: Mike, greeting: "On-call team, this is Mike." }
     after_hours_fallback: [sms_dispatch, push, crm_task]
   operations:
     name: Operations and Project Management
