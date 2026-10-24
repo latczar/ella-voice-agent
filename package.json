@@ -10,17 +10,21 @@
   "scripts": {
     "validate": "tsx scripts/validate-config.ts",
     "render": "tsx scripts/render-prompts.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:unit": "tsx --test tests/unit/*.test.ts",
+    "db:apply": "tsx scripts/db-apply.ts"
   },
   "dependencies": {
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "dotenv": "^18.0.9",
     "handlebars": "^4.7.10",
+    "pg": "^8.23.1",
     "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }
