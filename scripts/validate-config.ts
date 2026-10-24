@@ -39,11 +39,11 @@ function main(): number {
     problems.push(`prompt rendering failed: ${(err as Error).message}`);
   }
 
-  // Number reachability: "auto" numbers don't exist until provisioning creates them.
-  // After provisioning, scripts/provision.ts checks each number is attached in Vapi.
+  // Number reachability: an "auto" number doesn't exist until provisioning claims it.
+  const ella = config.agent.phone.number;
+  console.log(ella === "auto" ? `  --  ${config.agent.name}'s number: "auto" (claimed by provisioning)` : `  ok  ${config.agent.name}'s number: ${ella}`);
   for (const t of transferTargets(config)) {
-    if (t.number === "auto") console.log(`  --  ${t.key}: number is "auto" (created by provisioning)`);
-    else console.log(`  ok  ${t.key}: ${t.number}`);
+    console.log(t.via === "handoff" ? `  ok  ${t.key}: in-call hand-off to a stand-in assistant` : `  ok  ${t.key}: phone transfer to ${t.number}`);
   }
 
   if (config.alerts.sms_mode === "live") {

@@ -26,6 +26,9 @@ export interface ToolSpec {
   timeoutSeconds: number;
 }
 
+/** Name of the hand-off or transfer tool for a department, e.g. transfer_to_residential_sales. */
+export const transferToolName = (departmentKey: string): string => `transfer_to_${departmentKey}`;
+
 const str = (description: string, extra: Partial<JsonSchema> = {}): JsonSchema => ({ type: "string", description, ...extra });
 
 export function toolSpecs(c: ClientConfig): ToolSpec[] {
@@ -37,7 +40,7 @@ export function toolSpecs(c: ClientConfig): ToolSpec[] {
     {
       name: "check_hours",
       description:
-        "Check whether a department is open right now, before deciding between a transfer and the after-hours option. Returns open (true or false) and, if closed, when it next opens.",
+        "Check whether a department can take a transfer right now, before choosing between a transfer and the after-hours option. Returns can_transfer (true or false) and, if not, when the team is next available.",
       parameters: {
         type: "object",
         additionalProperties: false,

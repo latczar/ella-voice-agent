@@ -5,265 +5,685 @@
   "description": "One file per client. Validated by scripts/validate-config.ts before anything is provisioned.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["client_id", "environment", "business", "agent", "locale", "voice", "call", "hours", "departments", "intents", "alerts", "crm", "calendar", "kb", "policies"],
+  "required": [
+    "client_id",
+    "environment",
+    "business",
+    "agent",
+    "locale",
+    "voice",
+    "call",
+    "hours",
+    "departments",
+    "intents",
+    "alerts",
+    "crm",
+    "calendar",
+    "kb",
+    "policies"
+  ],
   "properties": {
-    "client_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,30}$" },
-    "environment": { "enum": ["staging", "live"] },
-
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,30}$"
+    },
+    "environment": {
+      "enum": [
+        "staging",
+        "live"
+      ]
+    },
     "business": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "short_name", "spoken_name", "description"],
+      "required": [
+        "name",
+        "short_name",
+        "spoken_name",
+        "description"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "short_name": { "type": "string", "minLength": 1 },
-        "spoken_name": { "type": "string", "minLength": 1, "description": "How the voice should pronounce the business name." },
-        "description": { "type": "string", "minLength": 1 },
-        "website": { "type": ["string", "null"], "format": "uri" }
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "short_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spoken_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "How the voice should pronounce the business name."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "website": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
       }
     },
-
     "agent": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "role", "tone", "first_message"],
+      "required": [
+        "name",
+        "role",
+        "tone",
+        "first_message",
+        "phone"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "role": { "type": "string", "minLength": 1 },
-        "tone": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-        "first_message": { "type": "string", "minLength": 10 }
-      }
-    },
-
-    "locale": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["language", "country", "timezone", "emergency_number"],
-      "properties": {
-        "language": { "type": "string", "pattern": "^[a-z]{2}-[A-Z]{2}$" },
-        "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
-        "timezone": { "type": "string", "description": "IANA name, e.g. America/Chicago. Checked at runtime by validate-config." },
-        "emergency_number": { "type": "string", "pattern": "^[0-9]{3}$" }
-      }
-    },
-
-    "voice": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["provider", "voice_id", "transcriber", "model"],
-      "properties": {
-        "provider": { "type": "string" },
-        "voice_id": { "type": "string" },
-        "transcriber": {
-          "type": "object",
-          "required": ["provider", "model", "language"],
-          "properties": { "provider": { "type": "string" }, "model": { "type": "string" }, "language": { "type": "string" } }
+        "name": {
+          "type": "string",
+          "minLength": 1
         },
-        "model": {
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tone": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "first_message": {
+          "type": "string",
+          "minLength": 10
+        },
+        "phone": {
           "type": "object",
-          "required": ["provider", "model", "temperature"],
+          "additionalProperties": false,
+          "required": [
+            "number"
+          ],
           "properties": {
-            "provider": { "type": "string" },
-            "model": { "type": "string" },
-            "temperature": { "type": "number", "minimum": 0, "maximum": 1 },
-            "max_tokens": { "type": "integer", "minimum": 50 }
+            "number": {
+              "$ref": "#/$defs/numberOrAuto"
+            },
+            "area_code": {
+              "type": "string",
+              "pattern": "^[2-9][0-9]{2}$",
+              "description": "US area code for a free Vapi number."
+            }
           }
         }
       }
     },
-
+    "locale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "language",
+        "country",
+        "timezone",
+        "emergency_number"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "pattern": "^[a-z]{2}-[A-Z]{2}$"
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA name, e.g. America/Chicago. Checked at runtime by validate-config."
+        },
+        "emergency_number": {
+          "type": "string",
+          "pattern": "^[0-9]{3}$"
+        }
+      }
+    },
+    "voice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "voice_id",
+        "transcriber",
+        "model"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "voice_id": {
+          "type": "string"
+        },
+        "transcriber": {
+          "type": "object",
+          "required": [
+            "provider",
+            "model",
+            "language"
+          ],
+          "properties": {
+            "provider": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            }
+          }
+        },
+        "model": {
+          "type": "object",
+          "required": [
+            "provider",
+            "model",
+            "temperature"
+          ],
+          "properties": {
+            "provider": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "temperature": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "max_tokens": {
+              "type": "integer",
+              "minimum": 50
+            }
+          }
+        },
+        "voice_version": {
+          "enum": [
+            1,
+            2
+          ]
+        }
+      }
+    },
     "call": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["answer_on_first_ring", "silence_timeout_seconds", "max_duration_seconds", "end_call_message"],
+      "required": [
+        "answer_on_first_ring",
+        "silence_timeout_seconds",
+        "max_duration_seconds",
+        "end_call_message"
+      ],
       "properties": {
-        "answer_on_first_ring": { "type": "boolean" },
-        "silence_timeout_seconds": { "type": "integer", "minimum": 10, "maximum": 3600 },
-        "max_duration_seconds": { "type": "integer", "minimum": 60, "maximum": 43200 },
-        "end_call_message": { "type": "string" }
+        "answer_on_first_ring": {
+          "type": "boolean"
+        },
+        "silence_timeout_seconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 3600
+        },
+        "max_duration_seconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 43200
+        },
+        "end_call_message": {
+          "type": "string"
+        }
       }
     },
-
     "hours": {
       "type": "object",
       "description": "Named weekly schedules; departments reference them with YAML anchors.",
-      "additionalProperties": { "$ref": "#/$defs/weekSchedule" }
+      "additionalProperties": {
+        "$ref": "#/$defs/weekSchedule"
+      }
     },
-
     "departments": {
       "type": "object",
       "minProperties": 1,
-      "propertyNames": { "pattern": "^[a-z][a-z_]*$" },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z_]*$"
+      },
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "number", "transfer_type", "hours", "persona", "after_hours_fallback"],
+        "required": [
+          "name",
+          "transfer_to",
+          "transfer_type",
+          "hours",
+          "persona",
+          "after_hours_fallback"
+        ],
         "properties": {
-          "name": { "type": "string", "minLength": 1 },
-          "number": { "$ref": "#/$defs/numberOrAuto" },
-          "transfer_type": { "enum": ["warm", "cold"] },
-          "hours": { "$ref": "#/$defs/weekSchedule" },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "transfer_to": {
+            "description": "\"assistant\" for an in-call hand-off to a stand-in assistant, or an E.164 number for a phone transfer.",
+            "anyOf": [
+              {
+                "const": "assistant"
+              },
+              {
+                "$ref": "#/$defs/e164"
+              }
+            ]
+          },
+          "transfer_type": {
+            "enum": [
+              "warm",
+              "cold"
+            ]
+          },
+          "hours": {
+            "$ref": "#/$defs/weekSchedule"
+          },
           "persona": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name", "greeting"],
-            "properties": { "name": { "type": "string" }, "greeting": { "type": "string" } }
+            "required": [
+              "name",
+              "greeting"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "greeting": {
+                "type": "string"
+              }
+            }
           },
           "after_hours_fallback": {
             "type": "array",
             "minItems": 1,
-            "items": { "enum": ["calendar_booking", "crm_task", "email_high_priority", "sms_dispatch", "push", "crm_flag", "notify_pm", "crm_billing_queue"] }
+            "items": {
+              "enum": [
+                "calendar_booking",
+                "crm_task",
+                "email_high_priority",
+                "sms_dispatch",
+                "push",
+                "crm_flag",
+                "notify_pm",
+                "crm_billing_queue"
+              ]
+            }
           }
         }
       }
     },
-
-    "unanswered_transfer_test": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["enabled", "number"],
-      "properties": { "enabled": { "type": "boolean" }, "number": { "$ref": "#/$defs/numberOrAuto" } }
-    },
-
     "intents": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "label", "caller_need", "department", "required_fields", "in_hours", "after_hours"],
+        "required": [
+          "id",
+          "label",
+          "caller_need",
+          "department",
+          "required_fields",
+          "in_hours",
+          "after_hours"
+        ],
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-z][a-z_]*$" },
-          "label": { "type": "string" },
-          "caller_need": { "$ref": "#/$defs/callerNeed" },
-          "department": { "type": ["string", "null"], "description": "Key in departments, or null for no transfer." },
-          "emergency": { "type": "boolean" },
-          "required_fields": { "type": "array", "items": { "$ref": "#/$defs/leadField" }, "uniqueItems": true },
-          "in_hours": { "type": "string" },
-          "after_hours": { "type": "string" }
-        }
-      }
-    },
-
-    "alerts": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["sms_mode", "dispatch_sms_group", "push"],
-      "properties": {
-        "sms_mode": { "enum": ["test", "push", "live"] },
-        "dispatch_sms_group": { "type": "array", "items": { "$ref": "#/$defs/e164" }, "minItems": 1 },
-        "twilio_test_from": { "$ref": "#/$defs/e164" },
-        "push": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["provider", "topic_env", "emergency_always"],
-          "properties": {
-            "provider": { "const": "ntfy" },
-            "topic_env": { "type": "string", "pattern": "^[A-Z_]+$" },
-            "emergency_always": { "type": "boolean" }
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z_]*$"
+          },
+          "label": {
+            "type": "string"
+          },
+          "caller_need": {
+            "$ref": "#/$defs/callerNeed"
+          },
+          "department": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Key in departments, or null for no transfer."
+          },
+          "emergency": {
+            "type": "boolean"
+          },
+          "required_fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/leadField"
+            },
+            "uniqueItems": true
+          },
+          "in_hours": {
+            "type": "string"
+          },
+          "after_hours": {
+            "type": "string"
           }
         }
       }
     },
-
+    "alerts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sms_mode",
+        "dispatch_sms_group",
+        "push"
+      ],
+      "properties": {
+        "sms_mode": {
+          "enum": [
+            "test",
+            "push",
+            "live"
+          ]
+        },
+        "dispatch_sms_group": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/e164"
+          },
+          "minItems": 1
+        },
+        "twilio_test_from": {
+          "$ref": "#/$defs/e164"
+        },
+        "push": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider",
+            "topic_env",
+            "emergency_always"
+          ],
+          "properties": {
+            "provider": {
+              "const": "ntfy"
+            },
+            "topic_env": {
+              "type": "string",
+              "pattern": "^[A-Z_]+$"
+            },
+            "emergency_always": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
     "crm": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "lead_source", "billing_queue", "follow_up", "emergency"],
+      "required": [
+        "type",
+        "lead_source",
+        "billing_queue",
+        "follow_up",
+        "emergency"
+      ],
       "properties": {
-        "type": { "const": "hubspot" },
-        "lead_source": { "type": "string" },
-        "billing_queue": { "enum": ["ticket", "task"] },
-        "follow_up": { "enum": ["task"] },
-        "emergency": { "enum": ["task_high_priority"] }
+        "type": {
+          "const": "hubspot"
+        },
+        "lead_source": {
+          "type": "string"
+        },
+        "billing_queue": {
+          "enum": [
+            "ticket",
+            "task"
+          ]
+        },
+        "follow_up": {
+          "enum": [
+            "task"
+          ]
+        },
+        "emergency": {
+          "enum": [
+            "task_high_priority"
+          ]
+        }
       }
     },
-
     "calendar": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["provider", "event_type_id_env", "lookahead_days", "slots_to_offer"],
+      "required": [
+        "provider",
+        "event_type_id_env",
+        "lookahead_days",
+        "slots_to_offer"
+      ],
       "properties": {
-        "provider": { "const": "cal_com" },
-        "event_type_id_env": { "type": "string", "pattern": "^[A-Z_]+$" },
-        "lookahead_days": { "type": "integer", "minimum": 1, "maximum": 30 },
-        "slots_to_offer": { "type": "integer", "minimum": 1, "maximum": 5 }
+        "provider": {
+          "const": "cal_com"
+        },
+        "event_type_id_env": {
+          "type": "string",
+          "pattern": "^[A-Z_]+$"
+        },
+        "lookahead_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "slots_to_offer": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        }
       }
     },
-
     "kb": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "mode"],
-      "properties": { "path": { "type": "string" }, "mode": { "enum": ["prompt", "vapi"] } }
+      "required": [
+        "path",
+        "mode"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "prompt",
+            "vapi"
+          ]
+        }
+      }
     },
-
     "policies": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pricing", "brevity", "empathy", "safety_line", "consent", "timelines", "non_english"],
+      "required": [
+        "pricing",
+        "brevity",
+        "empathy",
+        "safety_line",
+        "consent",
+        "timelines",
+        "non_english"
+      ],
       "properties": {
-        "pricing": { "type": "string", "minLength": 10 },
+        "pricing": {
+          "type": "string",
+          "minLength": 10
+        },
         "brevity": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["max_words", "max_sentences"],
+          "required": [
+            "max_words",
+            "max_sentences"
+          ],
           "properties": {
-            "max_words": { "type": "integer", "minimum": 5 },
-            "max_sentences": { "type": "integer", "minimum": 1 },
-            "exception": { "type": "string" }
+            "max_words": {
+              "type": "integer",
+              "minimum": 5
+            },
+            "max_sentences": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "exception": {
+              "type": "string"
+            }
           }
         },
         "empathy": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["in_hours", "after_hours"],
-          "properties": { "in_hours": { "type": "string" }, "after_hours": { "type": "string" } }
+          "required": [
+            "in_hours",
+            "after_hours"
+          ],
+          "properties": {
+            "in_hours": {
+              "type": "string"
+            },
+            "after_hours": {
+              "type": "string"
+            }
+          }
         },
-        "safety_line": { "type": "string", "minLength": 10 },
+        "safety_line": {
+          "type": "string",
+          "minLength": 10
+        },
         "consent": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["recording", "sms_opt_in"],
-          "properties": { "recording": { "type": "string" }, "sms_opt_in": { "type": "string" } }
+          "required": [
+            "recording",
+            "sms_opt_in"
+          ],
+          "properties": {
+            "recording": {
+              "type": "string"
+            },
+            "sms_opt_in": {
+              "type": "string"
+            }
+          }
         },
-        "timelines": { "type": "string" },
-        "non_english": { "type": "string" }
+        "timelines": {
+          "type": "string"
+        },
+        "non_english": {
+          "type": "string"
+        }
       }
     }
   },
-
   "$defs": {
-    "e164": { "type": "string", "pattern": "^\\+[1-9][0-9]{7,14}$" },
+    "e164": {
+      "type": "string",
+      "pattern": "^\\+[1-9][0-9]{7,14}$"
+    },
     "numberOrAuto": {
-      "description": "An E.164 number, or \"auto\" to have provisioning create a free Vapi number.",
-      "anyOf": [{ "$ref": "#/$defs/e164" }, { "const": "auto" }]
+      "description": "An E.164 number, or \"auto\" to have provisioning claim a free Vapi number.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/e164"
+        },
+        {
+          "const": "auto"
+        }
+      ]
     },
     "dayHours": {
       "anyOf": [
-        { "enum": ["closed", "24h"] },
-        { "type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]-([01][0-9]|2[0-4]):[0-5][0-9]$" }
+        {
+          "enum": [
+            "closed",
+            "24h"
+          ]
+        },
+        {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]-([01][0-9]|2[0-4]):[0-5][0-9]$"
+        }
       ]
     },
     "weekSchedule": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+      "required": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
       "properties": {
-        "mon": { "$ref": "#/$defs/dayHours" },
-        "tue": { "$ref": "#/$defs/dayHours" },
-        "wed": { "$ref": "#/$defs/dayHours" },
-        "thu": { "$ref": "#/$defs/dayHours" },
-        "fri": { "$ref": "#/$defs/dayHours" },
-        "sat": { "$ref": "#/$defs/dayHours" },
-        "sun": { "$ref": "#/$defs/dayHours" }
+        "mon": {
+          "$ref": "#/$defs/dayHours"
+        },
+        "tue": {
+          "$ref": "#/$defs/dayHours"
+        },
+        "wed": {
+          "$ref": "#/$defs/dayHours"
+        },
+        "thu": {
+          "$ref": "#/$defs/dayHours"
+        },
+        "fri": {
+          "$ref": "#/$defs/dayHours"
+        },
+        "sat": {
+          "$ref": "#/$defs/dayHours"
+        },
+        "sun": {
+          "$ref": "#/$defs/dayHours"
+        }
       }
     },
     "leadField": {
-      "enum": ["full_name", "phone", "email", "property_address", "property_type", "caller_need", "pm_name", "invoice_or_account_number", "company_name", "facility_type", "roof_size_or_buildings"]
+      "enum": [
+        "full_name",
+        "phone",
+        "email",
+        "property_address",
+        "property_type",
+        "caller_need",
+        "pm_name",
+        "invoice_or_account_number",
+        "company_name",
+        "facility_type",
+        "roof_size_or_buildings"
+      ]
     },
     "callerNeed": {
-      "enum": ["New Roof", "Repair", "Storm Damage", "Billing", "Existing Project Status", "Supplier or Accounts Payable", "Other"]
+      "enum": [
+        "New Roof",
+        "Repair",
+        "Storm Damage",
+        "Billing",
+        "Existing Project Status",
+        "Supplier or Accounts Payable",
+        "Other"
+      ]
     }
   }
 }

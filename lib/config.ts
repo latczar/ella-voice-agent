@@ -17,7 +17,7 @@ export type LeadField =
 
 export interface Department {
   name: string;
-  number: string; // E.164 or "auto"
+  transfer_to: "assistant" | string; // "assistant" = in-call hand-off; otherwise an E.164 number
   transfer_type: "warm" | "cold";
   hours: WeekSchedule;
   persona: { name: string; greeting: string };
@@ -39,18 +39,18 @@ export interface ClientConfig {
   client_id: string;
   environment: "staging" | "live";
   business: { name: string; short_name: string; spoken_name: string; description: string; website?: string | null };
-  agent: { name: string; role: string; tone: string[]; first_message: string };
+  agent: { name: string; role: string; tone: string[]; first_message: string; phone: { number: string; area_code?: string } };
   locale: { language: string; country: string; timezone: string; emergency_number: string };
   voice: {
     provider: string;
     voice_id: string;
+    voice_version?: 1 | 2;
     transcriber: { provider: string; model: string; language: string };
     model: { provider: string; model: string; temperature: number; max_tokens?: number };
   };
   call: { answer_on_first_ring: boolean; silence_timeout_seconds: number; max_duration_seconds: number; end_call_message: string };
   hours: Record<string, WeekSchedule>;
   departments: Record<string, Department>;
-  unanswered_transfer_test?: { enabled: boolean; number: string };
   intents: Intent[];
   alerts: {
     sms_mode: "test" | "push" | "live";
@@ -160,9 +160,9 @@ export function crossCheck(c: ClientConfig): string[] {
   return problems;
 }
 
-/** Department keys plus the unanswered-test line, in a stable order (used for numbering and provisioning). */
-export function transferTargets(c: ClientConfig): { key: string; number: string }[] {
-  const targets = Object.entries(c.departments).map(([key, d]) => ({ key, number: d.number }));
-  if (c.unanswered_transfer_test?.enabled) targets.push({ key: "unanswered_test", number: c.unanswered_transfer_test.number });
-  return targets;
+/** How each department is reached: an in-call hand-off or a phone transfer. */
+export function transferTargets(c: ClientConfig): { key: string; via: "handoff" | "phone"; number: string | null }[] {
+  return Object.entries(c.departments).map(([key, d]) =>
+    d.transfer_to === "assistant" ? { key, via: "handoff" as const, number: null } : { key, via: "phone" as const, number: d.transfer_to },
+  );
 }

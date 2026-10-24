@@ -19,6 +19,9 @@ agent:
   tone: [professional, warm, articulate, confident, reassuring]
   # Spec greeting, with the recording consent line added (spec gap: no consent wording).
   first_message: "Thanks for calling J.R. and Co! My name is Ella. This call may be recorded for quality. How can I help you with your property today?"
+  phone:
+    number: auto                # "auto": provisioning claims one free Vapi US number
+    area_code: "312"            # ASSUMPTION: Chicago, to match the US Central timezone
 
 locale:
   language: en-US
@@ -29,7 +32,8 @@ locale:
 voice:
   # Through Vapi, so no separate ElevenLabs or Deepgram account is needed.
   provider: vapi
-  voice_id: Paige               # warm US female voice; checked on the first test call
+  voice_id: Savannah            # US female (Vapi voice v2); Paige and Hana are retired. Audition on the first call
+  voice_version: 2
   transcriber: { provider: deepgram, model: nova-3, language: en }
   model: { provider: openai, model: gpt-4o, temperature: 0.3, max_tokens: 250 }
 
@@ -67,52 +71,50 @@ hours:
     sat: 24h
     sun: 24h
 
-# Transfer targets. In this build each is a small "dummy" Vapi assistant on its
-# own free US number that answers as that team, so warm transfers can be heard.
-# number: "auto" means provisioning creates the number and records it in
-# configs/state/<client>.<environment>.json. A real client would put their E.164 numbers here.
+# Transfer targets. transfer_to picks how a transfer works:
+#   assistant - in-call hand-off to a stand-in Vapi assistant that answers as that team.
+#               Used for this build: Vapi's free plan has one number, and free numbers
+#               can't dial out, so phone-to-phone transfers aren't possible for free.
+#               Also works in the browser, so "Talk to Ella" can demo transfers.
+#   "+1..."   - phone transfer to a real number (a real client's setup), with an
+#               unanswered-call fallback. Supported by provisioning, not used here.
+# transfer_type: warm passes the whole conversation to the team; cold passes nothing.
 departments:
   residential_sales:
     name: Residential Sales
-    number: auto
+    transfer_to: assistant
     transfer_type: warm         # spec: "Cold/Warm"; ASSUMPTION warm
     hours: *standard
     persona: { name: Sam, greeting: "Residential Sales, this is Sam." }
     after_hours_fallback: [calendar_booking, crm_task]
   commercial:
     name: Commercial Division
-    number: auto
+    transfer_to: assistant
     transfer_type: warm         # ASSUMPTION: spec doesn't say
     hours: *standard
     persona: { name: Dana, greeting: "Commercial Division, this is Dana." }
     after_hours_fallback: [email_high_priority, crm_task]
   on_call:
     name: On-Call Manager
-    number: auto
+    transfer_to: assistant
     transfer_type: warm
     hours: *always              # ASSUMPTION: "24/7 On-Call Dispatch" in the spec prompt
     persona: { name: Mike, greeting: "On-call, this is Mike." }
     after_hours_fallback: [sms_dispatch, push, crm_task]
   operations:
     name: Operations and Project Management
-    number: auto
+    transfer_to: assistant
     transfer_type: warm
     hours: *standard
     persona: { name: Priya, greeting: "Operations, this is Priya." }
     after_hours_fallback: [crm_flag, notify_pm]
   finance:
     name: Finance
-    number: auto
+    transfer_to: assistant
     transfer_type: warm
     hours: *office
     persona: { name: Leo, greeting: "Finance, this is Leo." }
     after_hours_fallback: [crm_billing_queue]
-
-# A number with no assistant on it, used to exercise the unanswered-transfer
-# fallback in tests. Never offered to real callers.
-unanswered_transfer_test:
-  enabled: true
-  number: auto
 
 # Routing matrix (spec section 3, plus the gaps we resolved). The system prompt
 # and the tools are generated from this list.

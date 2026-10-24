@@ -7,6 +7,7 @@ import Handlebars from "handlebars";
 import type { ClientConfig, LeadField } from "./config";
 import { REPO_ROOT } from "./config";
 import { kbAsPromptText } from "./kb";
+import { transferToolName } from "./tools";
 
 const FIELD_LABELS: Record<LeadField, string> = {
   full_name: "full name",
@@ -44,6 +45,7 @@ export function renderSystemPrompt(c: ClientConfig): string {
     ...c,
     tone: c.agent.tone.join(", "),
     callerNeeds: CALLER_NEEDS.join(", "),
+    transferTools: Object.keys(c.departments).map(transferToolName).join(", "),
     vapi: vapiVariables(c),
     emergencyDepartmentName: emergency?.department ? c.departments[emergency.department].name : "the on-call team",
     intents: c.intents.map((i) => ({
@@ -51,6 +53,7 @@ export function renderSystemPrompt(c: ClientConfig): string {
       emergency: Boolean(i.emergency),
       departmentName: i.department ? c.departments[i.department].name : null,
       transferType: i.department ? c.departments[i.department].transfer_type : null,
+      transferTool: i.department ? transferToolName(i.department) : null,
       requiredFields: i.required_fields.map((f) => FIELD_LABELS[f]).join(", "),
     })),
     kb: c.kb.mode === "prompt" ? kbAsPromptText(c) : "Use the knowledge base search tool for questions about services, materials, warranties and process.",
