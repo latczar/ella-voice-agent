@@ -52,14 +52,6 @@ export async function POST(req: Request) {
       results: calls.map((c) => ({ toolCallId: c.id, name: c.function?.name ?? "unknown", error: "Configuration problem on our side." })),
     });
   }
-  // TEMP: record where a chat's variables sit when we found none (keys only, no values).
-  if (ctx.channel === "chat" && !ctx.isTest) {
-    const keys = (o: unknown) => (o && typeof o === "object" ? Object.keys(o) : []);
-    await logError("debug:chat-shape", "Chat tool call with no test flag", ctx.callId, {
-      message: keys(message), chat: keys(message.chat), call: keys(message.call), assistant: keys(message.assistant),
-    });
-  }
-
   const results = await Promise.all(
     calls.map(async (call) => {
       const name = call.function?.name ?? "unknown";
