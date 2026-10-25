@@ -1,0 +1,22 @@
+# Persona 8: existing customer asking about their project. Ella can't see status: she says so,
+# takes the address and PM name, then routes to Operations. No promised dates.
+name: Existing customer with a PM name
+time: "2026-10-27T15:00:00Z"        # Tuesday 10 AM US Central: Operations open
+opening: "Hi, you're replacing my roof at the moment and I want to know when the crew is coming back to finish."
+caller: |
+  You are Jamie Test, an existing customer. Your roof replacement started last week and the crew
+  hasn't been back for three days. Your project manager is Chris Sample. The address is
+  3300 Demo Drive, Evanston, IL 60201 (your house). Phone 847-555-0188 if asked.
+  First ask Ella directly when the crew will be back. Answer her questions briefly.
+expect:
+  intent: existing_customer
+  tools: [check_hours, log_lead, transfer_to_operations]
+  lead_fields: [full_name, property_address, pm_name]
+  lead_matches:
+    pm_name: 'chris'
+  says:
+    - check: Says plainly she can't see project status
+      pattern: 'can(''|no)?t (see|check|access|look up)|(don''t|do not) have access|(not able|unable) to (see|check|access|look up)'
+  never_says:
+    - check: Promises no crew or completion date
+      pattern: '\b(tomorrow|this week|next week|by (monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b'

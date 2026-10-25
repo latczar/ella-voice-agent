@@ -1,0 +1,17 @@
+# Persona 7: commercial maintenance in hours. Expect company name and facility info, then Commercial.
+name: Commercial maintenance, in hours
+time: "2026-10-27T15:00:00Z"        # Tuesday 10 AM US Central: Commercial Division open
+opening: "Hi, I manage a couple of warehouses and I'm looking for a preventive maintenance program for the roofs."
+caller: |
+  You are Taylor Test, facilities manager at Example Logistics. It's a commercial property:
+  two warehouses with flat TPO roofs, roughly 80,000 square feet in total. The site is
+  500 Sample Industrial Parkway, Elk Grove Village, IL 60007. Your phone is 224-555-0131
+  and your email is taylor.test@example.com. Nothing is leaking; you want regular maintenance.
+  Answer Ella's questions briefly; give each detail only when she asks for it.
+expect:
+  intent: commercial
+  tools: [check_hours, log_lead, transfer_to_commercial]
+  lead_fields: [full_name, company_name, property_address, facility_type, roof_size_or_buildings]
+  lead_matches:
+    company_name: 'example logistics'
+    property_type: '^commercial$'

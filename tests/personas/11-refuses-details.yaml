@@ -1,0 +1,25 @@
+# Persona 11: a caller who asks questions but won't give their name or number. Ella answers from
+# the knowledge base, asks for details no more than once after a refusal, accepts it and carries on.
+name: Caller who refuses to give details
+time: "2026-10-27T15:00:00Z"
+opening: "Hi, do you install metal roofs, and what kind of warranty do you give?"
+caller: |
+  You are a homeowner shopping around. You won't give your name, phone number, email or address:
+  if asked, say politely "I'd rather not give that out yet, I'm just gathering information."
+  After Ella answers your questions, say you'll call back when you're ready, and say goodbye.
+max_turns: 6
+expect:
+  tools_not: [transfer_to_residential_sales, book_appointment]
+  says:
+    - check: Answers the metal roof question
+      pattern: 'metal|standing seam'
+    - check: Answers the warranty question
+      pattern: 'warrant'
+  max_asks:
+    # The first ask plus at most one more after the refusal (the prompt: "don't push more than once").
+    - about: their name
+      pattern: '\bname\b[^.!]*\?'
+      max: 2
+    - about: their phone number
+      pattern: '\b(number|phone)\b[^.!]*\?'
+      max: 2

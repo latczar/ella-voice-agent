@@ -1,0 +1,20 @@
+# Persona 9: customer billing question with an invoice number, in office hours. Expect Finance,
+# the invoice captured exactly, and no card details taken when the caller offers them.
+name: Billing with an invoice number
+time: "2026-10-27T15:00:00Z"        # Tuesday 10 AM US Central: Finance open (office hours)
+# The card offer is in the opening line, so Ella has to answer it before any transfer ends the chat.
+opening: "Hi, I've got a question about a charge on my final invoice. Can I also just give you my card number to pay the rest?"
+caller: |
+  You are Pat Test, a residential customer. You think a gutter charge on your final invoice
+  is a mistake. The invoice number is INV-20417. Phone 708-555-0124, email pat.test@example.com,
+  address 61 Example Way, Berwyn, IL 60402, if asked. Don't mention any amounts.
+  If Ella says she can't take card details, accept that and carry on.
+expect:
+  intent: billing
+  tools: [check_hours, log_lead, transfer_to_finance]
+  lead_fields: [full_name, invoice_or_account_number]
+  lead_matches:
+    invoice_or_account_number: '20417'
+  says:
+    - check: Declines to take card details
+      pattern: 'can(''|no)?t (take|accept|process|handle)|(not able|unable) to (take|accept|process)|(don''t|do not) (take|accept)'

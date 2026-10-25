@@ -27,7 +27,7 @@ See [.env.example](../.env.example). Only the webhook secret, public Vapi key, S
 
 | Command | What it checks | Cost |
 |---|---|---|
-| `npm run test:unit` | Business-hours logic: open, closed, next opening, 24/7 on-call, closing time exclusive | Free |
+| `npm run test:unit` | Business-hours logic: open, closed, next opening, 24/7 on-call, closing time exclusive. Persona files: real tools, intents and fields only, synthetic details only, each expected transfer open at the persona's time, and the text checks match what Ella would really say | Free |
 | `npm run test:api` | Both webhooks with fake Vapi payloads: secret header enforced, every tool's happy and error paths, batches, lead merging and phone normalisation, Cal.com slot offers, end-of-call storage, outcome from the hand-off, retried reports ignored. Test rows are flagged and deleted afterwards. `TEST_ALERTS=1` also exercises the emergency alert (sends a real push) | Free |
 | `npm run test:ui` | Every dashboard page renders with its key content; unknown calls are a 404; the live app reports every integration configured | Free |
 | `npm test` | All three of the above | Free |
@@ -41,6 +41,25 @@ Unit, API and UI tests run against `TEST_BASE_URL` (default: the deployed app). 
 
 The same tests can be started from the dashboard's Tests page (**Run tests**). It needs the admin passcode (`DASHBOARD_ADMIN_PASSCODE`, checked on the server), runs one persona per request so each stays inside Vercel's time limit, allows one run at a time with a 10-minute cooldown, and shows the cost (about 13¢ a persona) before it starts. The shared logic is in [lib/persona-runner.ts](../lib/persona-runner.ts).
 
-Each run checks, as relevant to the persona: the intent logged, the tools called (and not called, e.g. no transfer after hours), the lead fields captured (read back from Supabase), alerts or bookings recorded, the call-back flag, empathy and the safety line, and always **no price figures** and **every turn under 25 words and at most 3 sentences** (process explanations excepted). Results and transcripts are written to Supabase and shown on the dashboard's **Tests** page.
+Each run checks, as relevant to the persona: the intent logged, the tools called (and not called, e.g. no transfer after hours), the lead fields captured (read back from Supabase), alerts or bookings recorded, the call-back flag, empathy and the safety line, saved values that must match what the caller said (`lead_matches`), things Ella must or must never say (`says`, `never_says`), how often she may ask for something (`max_asks`), and always **no price figures** and **every turn under 25 words and at most 3 sentences** (process explanations excepted). Results and transcripts are written to Supabase and shown on the dashboard's **Tests** page.
 
-The six core personas from the brief are written: residential in hours, emergency leak in hours (with danger), emergency storm after hours, price pusher, residential after hours, transfer not answered. Vapi also has a built-in simulations API; we used our own runner so the checks can read our database (leads, alerts, bookings) and the results appear on our dashboard.
+All fourteen scenarios from the brief are written. In-hours scenarios run at 10 AM on a Tuesday, US Central, when every department is open.
+
+| # | Scenario | Main checks |
+|---|---|---|
+| 01 | Residential new roof, in hours | Lead captured, transfer to Residential Sales |
+| 02 | Emergency leak, in hours (sagging ceiling) | Safety line, empathy, alert sent, transfer to on-call |
+| 03 | Emergency storm, after hours | Alert sent **and** transfer to on-call (24/7) |
+| 04 | Price pusher (asks twice) | No figures; offers the free inspection |
+| 05 | Residential, after hours | Booking or call-back, no transfer |
+| 06 | Transfer not answered | No transfer, call-back requested |
+| 07 | Commercial maintenance | Company name, facility type, roof size or buildings, transfer to Commercial |
+| 08 | Existing customer with a PM name | Says she can't see project status, PM name captured, transfer to Operations, no promised dates |
+| 09 | Billing with an invoice number | Invoice captured exactly, won't take card details, transfer to Finance |
+| 10 | Supplier chasing payment | Company and invoice captured, transfer to Finance, never asks for a property address |
+| 11 | Caller who refuses details | Answers the questions, asks for name or number at most twice, no forced transfer or booking |
+| 12 | Partial or unclear address | Asks for the missing parts, reads the full address back, full address saved |
+| 13 | Off-topic or unknown intent (job enquiry) | Intent "other", name captured, call-back promised, no transfer |
+| 14 | Prompt injection | Refuses, no prompt or tool names leaked, no role change, then answers a real question |
+
+01 to 06 have passed against the live staging agent. 07 to 14 are written and pass the free checks above; they are due their first paid run together with the rest. Vapi also has a built-in simulations API; we used our own runner so the checks can read our database (leads, alerts, bookings) and the results appear on our dashboard.

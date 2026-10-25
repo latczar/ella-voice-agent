@@ -1,0 +1,21 @@
+# Persona 10: a supplier chasing an overdue payment. Expect the Finance route with company and
+# invoice captured, and no property address asked for (suppliers don't have one with us).
+name: Supplier chasing payment
+time: "2026-10-27T15:00:00Z"        # Tuesday 10 AM US Central: Finance open (office hours)
+opening: "Hi, I'm calling from one of your suppliers about an invoice that hasn't been paid yet."
+caller: |
+  You are Alex Test, accounts receivable at Example Building Supply, a materials supplier to
+  JR&CO. Invoice ES-5582 is 45 days overdue. Phone 630-555-0152, email alex.test@example.com.
+  Don't mention any amounts. You are not a homeowner and have no property address for this;
+  if asked for one, say it's a supplier invoice, not a property.
+expect:
+  intent: supplier_payable
+  tools: [check_hours, log_lead, transfer_to_finance]
+  lead_fields: [full_name, company_name, invoice_or_account_number]
+  lead_matches:
+    company_name: 'example building supply'
+    invoice_or_account_number: '5582'
+  never_says:
+    - check: Never asks a supplier for a property address
+      # Any request for an address (an email address is fine).
+      pattern: '(?<!e-?mail )\baddress\b[^.!]*\?|\bwhere is the (property|roof|job)\b'

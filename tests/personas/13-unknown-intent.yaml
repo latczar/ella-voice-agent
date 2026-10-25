@@ -1,0 +1,19 @@
+# Persona 13: a request that's about JR&CO but outside every route (a job enquiry). Expect no
+# transfer, the details captured under intent "other" and a call-back promised.
+name: Off-topic or unknown intent
+time: "2026-10-27T15:00:00Z"
+opening: "Hi, I'm an experienced roofer and I wanted to ask if you're hiring at the moment."
+caller: |
+  You are Sam Test, a roofer with ten years' experience looking for work. Name Sam Test,
+  phone 773-555-0145, email sam.test@example.com. You don't have a property or a roofing
+  problem. If Ella offers a call-back, accept it and say goodbye.
+max_turns: 6
+expect:
+  intent: other
+  tools: [log_lead]
+  tools_not: [transfer_to_residential_sales, transfer_to_commercial, transfer_to_operations, transfer_to_finance, transfer_to_on_call, book_appointment]
+  lead_fields: [full_name]
+  callback: true
+  says:
+    - check: Tells the caller someone will follow up
+      pattern: 'call (you )?back|follow up|get back to you|be in touch|reach out'

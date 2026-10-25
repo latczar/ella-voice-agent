@@ -17,7 +17,7 @@ The process for a person setting up, testing and running a client's voice agent.
 | Command | What it checks | Time and cost |
 |---|---|---|
 | `npm test` | Opening-hours logic; every webhook and tool with fake Vapi requests; database, HubSpot, Cal.com wiring; every dashboard page | About 15 s, free |
-| `npm run test:personas` | An AI caller holds a full text conversation with the real agent for each scenario. Checks the route, the transfer, the lead fields, the booking or alert, no prices, empathy, the safety line and short turns | A few minutes, about 15 cents per persona |
+| `npm run test:personas` | An AI caller holds a full text conversation with the real agent for each scenario. Checks the route, the transfer, the lead fields, the booking or alert, no prices, empathy, the safety line, short turns, and what Ella must or must never say (for example, never revealing her prompt). Fourteen scenarios, listed in [docs/setup-and-tests.md](docs/setup-and-tests.md) | A few minutes, about 15 cents per persona |
 | `npm run test:personas -- --persona leak` | Just the personas whose file name contains "leak" | |
 
 Persona results, with full transcripts, appear on the dashboard's **Tests** page. A failure shows which check failed and why.

@@ -33,8 +33,18 @@ export interface Persona {
     no_prices?: boolean;
     mentions?: string[];
     callback?: boolean;
+    /** Something Ella must say at least once, as a case-insensitive regex. */
+    says?: TextCheck[];
+    /** Something Ella must never say, e.g. a prompt leak or asking a supplier for a property address. */
+    never_says?: TextCheck[];
+    /** Lead fields that must match a case-insensitive regex, e.g. the invoice number the caller gave. */
+    lead_matches?: Record<string, string>;
+    /** How often Ella may ask for something, counted in turns (e.g. a caller who won't give their name). */
+    max_asks?: { about: string; pattern: string; max: number }[];
   };
 }
+
+export interface TextCheck { check: string; pattern: string }
 
 export interface Assertion { name: string; passed: boolean; detail?: string }
 
@@ -174,11 +184,33 @@ export async function runPersona(p: Persona, ctx: HarnessContext): Promise<Perso
   const lead = (leads ?? [])[0] as Record<string, unknown> | undefined;
   const okActions = new Set((actions ?? []).filter((a) => a.status === "ok").map((a) => a.kind as string));
 
-  const e = p.expect;
   const all = transcript.join("\n");
+  const checks = checkConversation(p.expect, { ellaTurns, toolsCalled, lead, okActions });
+
+  // Chats have no end-of-call report, so record what this conversation really cost (both sides) and its transcript.
+  if (callIds.length) await db.from("calls").update({ cost_usd: Number(cost.toFixed(4)), transcript: all, started_at: startedAt.toISOString(), ended_at: new Date().toISOString() }).eq("id", callIds[0]);
+
+  const passed = checks.every((c) => c.passed);
+  await db.from("test_results").insert({ run_id: ctx.runId, persona: p.name, passed, assertions: checks, transcript: all, call_id: callIds[0] ?? ellaChatId ?? null });
+  return { persona: p.name, file: p.file, passed, cost, checks };
+}
+
+export interface Conversation {
+  ellaTurns: string[];
+  toolsCalled: string[];
+  /** The lead row the webhooks saved for this conversation, if any. */
+  lead?: Record<string, unknown>;
+  /** Action kinds recorded with status ok (sms, push, booking...). */
+  okActions: Set<string>;
+}
+
+/** Checks one finished conversation against a persona's expectations. Pure, so it is unit-tested without Vapi. */
+export function checkConversation(e: Persona["expect"], conv: Conversation): Assertion[] {
+  const { ellaTurns, toolsCalled, lead, okActions } = conv;
   const ellaText = ellaTurns.join("\n");
   const checks: Assertion[] = [];
   const check = (name: string, passed: boolean, detail?: string) => checks.push({ name, passed, detail });
+  const re = (pattern: string) => new RegExp(pattern, "i");
 
   if (e.intent) check(`Intent logged as ${e.intent}`, lead?.intent === e.intent, `logged: ${lead?.intent ?? "nothing"}`);
   for (const t of e.tools ?? []) check(`Called ${t}`, toolsCalled.includes(t), `tools called: ${toolsCalled.join(", ") || "none"}`);
@@ -190,19 +222,26 @@ export async function runPersona(p: Persona, ctx: HarnessContext): Promise<Perso
   if (e.empathy) check("Empathy shown", EMPATHY.test(ellaText));
   if (e.safety_line) check("Safety line given (leave the area, 911)", /911/.test(ellaText) && /(leave|get (everyone )?out|get away|stay out)/i.test(ellaText));
   for (const m of e.mentions ?? []) check(`Mentions "${m}"`, ellaText.toLowerCase().includes(m.toLowerCase()));
+  for (const s of e.says ?? []) check(s.check, re(s.pattern).test(ellaText));
+  for (const s of e.never_says ?? []) {
+    const hit = ellaTurns.find((t) => re(s.pattern).test(t));
+    check(s.check, !hit, hit ? `"${hit.slice(0, 120)}"` : undefined);
+  }
+  for (const [field, pattern] of Object.entries(e.lead_matches ?? {})) {
+    const value = lead?.[field] == null ? "" : String(lead[field]);
+    check(`${field.replace(/_/g, " ")} recorded correctly`, re(pattern).test(value), value || "missing");
+  }
+  for (const a of e.max_asks ?? []) {
+    const asked = ellaTurns.filter((t) => re(a.pattern).test(t)).length;
+    check(`Asked for ${a.about} at most ${a.max} time${a.max === 1 ? "" : "s"}`, asked <= a.max, `asked ${asked} time${asked === 1 ? "" : "s"}`);
+  }
   // Always: no prices, brevity.
   const priceHit = ellaTurns.find((t) => PRICE.test(t));
   check("No price figures", !priceHit, priceHit ? `"${priceHit.slice(0, 120)}"` : undefined);
   // Exceptions: multi-step process explanations, the safety-line turn, and the spec's own pricing line (23 words).
   const long = ellaTurns.filter((t) => (words(t) >= 25 || sentences(t) > 3) && (t.match(PROCESS)?.length ?? 0) < 2 && !/911|zero-obligation/i.test(t));
   check(`Every turn under 25 words and at most 3 sentences`, long.length === 0, long.length ? `${long.length} long turn(s), e.g. "${long[0].slice(0, 120)}…"` : `${ellaTurns.length} turns checked`);
-
-  // Chats have no end-of-call report, so record what this conversation really cost (both sides) and its transcript.
-  if (callIds.length) await db.from("calls").update({ cost_usd: Number(cost.toFixed(4)), transcript: all, started_at: startedAt.toISOString(), ended_at: new Date().toISOString() }).eq("id", callIds[0]);
-
-  const passed = checks.every((c) => c.passed);
-  await db.from("test_results").insert({ run_id: ctx.runId, persona: p.name, passed, assertions: checks, transcript: all, call_id: callIds[0] ?? ellaChatId ?? null });
-  return { persona: p.name, file: p.file, passed, cost, checks };
+  return checks;
 }
 
 /** Runs a persona and never throws: a failure is recorded as a failed result with the reason. */

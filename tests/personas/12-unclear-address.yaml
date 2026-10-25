@@ -1,0 +1,24 @@
+# Persona 12: the caller gives a partial address. Ella asks for the missing parts and reads the
+# full address back before the transfer, and the lead holds the complete address.
+name: Partial or unclear address
+time: "2026-10-27T15:00:00Z"        # Tuesday 10 AM US Central: Residential Sales open
+opening: "Hi, I've got some shingles missing after the wind last week and I'd like someone to take a look."
+caller: |
+  You are Robin Test, a homeowner. A few shingles blew off last week; nothing is leaking and
+  nobody is in danger. You want a repair inspection. It's your house (residential).
+  Your full address is 1240 Sample Street, Skokie, IL 60076, but give it in pieces:
+  when first asked for the address, say only "It's on Sample Street in Skokie."
+  Give the house number (1240) only when Ella asks for it, and the ZIP (60076) only when asked.
+  If Ella reads the address back, confirm it. Name Robin Test, phone 847-555-0196,
+  email robin.test@example.com, if asked.
+expect:
+  intent: new_residential
+  tools: [check_hours, log_lead, transfer_to_residential_sales]
+  lead_fields: [full_name, property_address]
+  lead_matches:
+    property_address: '1240.*sample.*skokie'
+  says:
+    - check: Asks for the missing part of the address
+      pattern: '(house|street) number|which number|what number|zip'
+    - check: Reads the full address back
+      pattern: '1240|twelve forty|one two four zero'
