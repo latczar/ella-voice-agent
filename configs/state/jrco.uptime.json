@@ -1,0 +1,9 @@
+{
+  "client_id": "jrco",
+  "updated_at": "2026-10-25T09:13:13.947Z",
+  "health_url": "https://ella-voice-agent.vercel.app/api/health",
+  "monitor_id": "5124867",
+  "status_page_id": "268934",
+  "status_page_resource_id": "9037419",
+  "status_page_url": "https://jrco-ella-status.betteruptime.com"
+}

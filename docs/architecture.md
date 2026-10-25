@@ -89,4 +89,5 @@ Each has a clear name, a model-facing description saying when to call it, a stri
 - The public dashboard reads only `public_*` views, which show demo and test calls; real callers' details never appear publicly. Base tables have RLS on and no anon access.
 - Call recordings stay with Vapi. The stored link is a private storage URL that doesn't play on its own; listen to a recording in the Vapi dashboard under Call Logs. The public dashboard never shows recordings of real calls.
 - Silence: "Are you still there?" after 10 seconds, then a goodbye and hang-up after 30. Calls are capped at 15 minutes.
+- Uptime: a BetterStack monitor checks `/api/health` every 3 minutes, and the [public status page](https://jrco-ella-status.betteruptime.com) shows it. The health check reads the database (3-second cap) and returns 503 if it doesn't answer; it never calls Vapi, so it costs no credit. `npm run uptime` creates or updates both, with IDs saved in `configs/state/jrco.uptime.json`.
 - Secrets live in `.env` and Vercel only. Synthetic data only in tests and seeds.

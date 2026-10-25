@@ -36,4 +36,3 @@ The brief asks for a working core over polish, so the tiers were built in order 
 - **Personas 07 to 14** (commercial, existing customer, billing, supplier, refuser, unclear address, off-topic, prompt injection): the behaviour is in the prompt and routing, but only the six core personas have automated runs. Each run costs Vapi credit, so runs were kept to what proved the core.
 - **Real phone transfers:** stand-in department assistants via Vapi hand-offs instead, as the free number cannot dial out. A real number can be set per department in the config.
 - **Email:** no email service; high-priority HubSpot tasks instead.
-- **BetterStack monitor and status page:** optional (Could tier). `/api/health` is ready for one.

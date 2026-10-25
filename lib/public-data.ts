@@ -2,7 +2,9 @@
 // dashboard can only ever see what those views expose (see supabase/schema.sql).
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { loadConfig, type ClientConfig } from "./config";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { loadConfig, REPO_ROOT, type ClientConfig } from "./config";
 import { readState } from "./state";
 
 let anon: SupabaseClient | null | undefined;
@@ -27,7 +29,15 @@ export function siteInfo() {
     number: state.phone_numbers.ella?.number ?? null,
     assistantId: state.assistants.ella ?? null,
     timezone: c.locale.timezone,
+    statusPageUrl: statusPageUrl(c.client_id),
   };
+}
+
+/** The public BetterStack status page, if npm run uptime has created one. */
+function statusPageUrl(clientId: string): string | null {
+  const file = path.join(REPO_ROOT, "configs", "state", `${clientId}.uptime.json`);
+  if (!existsSync(file)) return null;
+  return (JSON.parse(readFileSync(file, "utf8")) as { status_page_url?: string | null }).status_page_url ?? null;
 }
 
 export interface PublicCall {

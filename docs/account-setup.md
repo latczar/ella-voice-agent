@@ -49,6 +49,10 @@ Do them in this order: the first two unblock the first working call.
 1. Install **ntfy** from the App Store or Play Store.
 2. Tap **+**, server `ntfy.sh`, topic: the `NTFY_TOPIC` value in your `.env`. Emergency alerts will arrive here.
 
-## 8. BetterStack (optional, "Could" tier; skip for now)
+## 8. BetterStack (uptime monitor and status page)
+1. Sign up at betterstack.com (free plan).
+2. Uptime → **Settings → API tokens** → under the team, **Create API token** (an Uptime token, not a Telemetry one).
+3. Put it in `.env` as `BETTERSTACK_API_TOKEN`. It's only used locally by `npm run uptime`, so it doesn't go on Vercel.
+4. `npm run uptime` creates the monitor and the public status page (rerunning updates them).
 
 When a section is done, tell me which one and I'll check the keys work (I never print them back).

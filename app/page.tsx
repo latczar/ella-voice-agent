@@ -110,6 +110,12 @@ export default async function Overview() {
               <dd>{health?.failed_transfers_7d ? <Badge tone="bad">{health.failed_transfers_7d}</Badge> : <Badge tone="ok">0</Badge>}</dd>
               <dt>Webhook errors, 24 hours</dt>
               <dd>{health?.errors_24h ? <Badge tone="warn">{health.errors_24h}</Badge> : <Badge tone="ok">0</Badge>}</dd>
+              {site.statusPageUrl && (
+                <>
+                  <dt>Uptime</dt>
+                  <dd><a href={site.statusPageUrl} target="_blank" rel="noreferrer">Status page</a></dd>
+                </>
+              )}
             </dl>
             {errors.length > 0 && (
               <div style={{ marginTop: 20 }}>

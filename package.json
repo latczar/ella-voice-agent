@@ -21,6 +21,7 @@
     "env:vercel": "tsx scripts/env-for-vercel.ts",
     "check": "tsx scripts/check-integrations.ts",
     "seed-demo": "tsx scripts/seed-demo.ts",
+    "uptime": "tsx scripts/setup-uptime.ts",
     "test:api": "tsx --test tests/api/*.test.ts",
     "test:personas": "tsx tests/run-tests.ts",
     "test:ui": "tsx --test tests/ui/*.test.ts",

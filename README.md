@@ -33,6 +33,7 @@ Ella answers every call to JR&CO Roofing (a fictional US roofer), 24/7: she answ
 |---|---|
 | Dashboard, and "Talk to Ella" in the browser | https://ella-voice-agent.vercel.app |
 | Call Ella (US) | **+1 (213) 464-0087** |
+| Uptime status page | https://jrco-ella-status.betteruptime.com |
 
 All data is synthetic. Please don't give Ella real personal details.
 
