@@ -8,6 +8,7 @@ import TalkToElla from "./talk-to-ella";
 import { Badge, CallTags, OutcomeBadge, PageHead, Stat, When } from "./ui";
 import CallRow from "./call-row";
 import LiveRefresh from "./live-refresh";
+import SystemStatus from "./system-status";
 import { NewBadge, SeenScope } from "./new-rows";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +41,7 @@ export default async function Overview() {
         <section aria-labelledby="call-heading">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
             <h2 id="call-heading">Talk to {site.agentName}</h2>
-            <Badge tone="ok">Answering now</Badge>
+            <SystemStatus statusPageUrl={site.statusPageUrl} />
           </div>
           <div>
             <div className="muted">Phone (US)</div>
