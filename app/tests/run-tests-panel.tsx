@@ -84,20 +84,20 @@ export default function RunTestsPanel({ personaCount, costEach }: { personaCount
   }
 
   return (
-    <section className="card run-panel" aria-live="polite">
-      <div className="card-head">
+    <section className="panel run-panel" aria-live="polite">
+      <div className="panel-head">
         <h2>Run tests</h2>
         {!busy && <button className="btn btn-sm" onClick={() => setOpen(false)}>Close</button>}
       </div>
-      <div className="card-body" style={{ display: "grid", gap: 12 }}>
-        <p className="muted" style={{ margin: 0 }}>
+      <div className="panel-body" style={{ display: "grid", gap: 12 }}>
+        <p className="muted">
           Runs all {personaCount} scenarios by text against the staging assistant, one at a time (about 30 seconds each).
           Each run costs about {estimate} in Vapi credit and creates test records in HubSpot and Cal.com, so it needs the admin passcode.
         </p>
         <form onSubmit={run} className="run-form">
           <label className="sr-only" htmlFor="passcode">Admin passcode</label>
           <input id="passcode" className="input" type="password" autoComplete="current-password" placeholder="Admin passcode" value={passcode} onChange={(e) => setPasscode(e.target.value)} disabled={busy} required />
-          <button className="btn btn-primary" type="submit" disabled={busy || !passcode}>{busy ? "Running…" : `Run ${personaCount} tests · ~${estimate}`}</button>
+          <button className="btn btn-primary" type="submit" disabled={busy || !passcode}>{busy ? "Running…" : `Run ${personaCount} tests (about ${estimate})`}</button>
         </form>
         {error && <div className="notice bad" role="alert">{error}</div>}
         {steps.length > 0 && (
@@ -106,8 +106,8 @@ export default function RunTestsPanel({ personaCount, costEach }: { personaCount
               <li key={s.file}>
                 <span className={s.status === "running" ? "spinner" : "spinner idle"} aria-hidden />
                 <span className="run-name">{s.name}</span>
-                <span className="faint num run-note">{s.note}{s.cost != null ? ` · $${s.cost.toFixed(2)}` : ""}</span>
-                <span className={`badge b-${STATUS[s.status].tone}`}>{STATUS[s.status].label}</span>
+                <span className="faint num run-note">{s.note}{s.cost != null ? `, $${s.cost.toFixed(2)}` : ""}</span>
+                <span className={`chip c-${STATUS[s.status].tone}`}>{STATUS[s.status].label}</span>
               </li>
             ))}
           </ol>

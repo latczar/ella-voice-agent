@@ -5,7 +5,7 @@ import LiveRefresh from "../live-refresh";
 import { NewBadge, SeenScope } from "../new-rows";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Calls · Ella console" };
+export const metadata = { title: "Calls, Ella console" };
 
 export default async function CallsPage() {
   const c = config();
@@ -13,8 +13,8 @@ export default async function CallsPage() {
   const calls = await getCalls(200);
   return (
     <main className="page">
-      <PageHead title="Calls" sub="Every call Ella has handled, newest first. Times are US Central." right={<LiveRefresh />} />
-      <section className="card">
+      <PageHead title="Calls" sub={`Every call Ella has handled, newest first (${calls.length} shown). Times are US Central.`} right={<LiveRefresh />} />
+      <section className="panel">
         <SeenScope scope="calls" ids={calls.map((x) => x.id)}>
         <div className="table-wrap">
           <table className="table">
@@ -32,8 +32,8 @@ export default async function CallsPage() {
                   <td className="cell-main">{intentLabel(c, x.intent)}</td>
                   <td className="muted hide-sm hide-md">{departmentName(c, x.route)}</td>
                   <td><OutcomeBadge outcome={x.outcome} /></td>
-                  <td className="right num hide-sm">{formatDuration(x.duration_s)}</td>
-                  <td className="right num hide-sm">{formatCost(x.cost_usd)}</td>
+                  <td className="right measured hide-sm">{formatDuration(x.duration_s)}</td>
+                  <td className="right measured hide-sm">{formatCost(x.cost_usd)}</td>
                   <td className="right nowrap hide-sm"><CallTags isDemo={x.is_demo} isTest={x.is_test} redacted={x.redacted} /></td>
                 </CallRow>
               ))}

@@ -1,16 +1,17 @@
 import type { ReactNode } from "react";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Atkinson_Hyperlegible_Mono, Host_Grotesk } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import Nav from "./nav";
 import ThemeToggle from "./theme-toggle";
 import { formatUsNumber, siteInfo } from "@/lib/public-data";
 
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+// Host Grotesk for what a person reads; Atkinson Hyperlegible Mono for what was measured (times, figures, numbers).
+const sans = Host_Grotesk({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-host", display: "swap" });
+const mono = Atkinson_Hyperlegible_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-atkinson-mono", display: "swap" });
 
 export const metadata = {
-  title: "Ella console · JR&CO Roofing",
+  title: "Ella console, JR&CO Roofing",
   description: "Calls, leads and test results for Ella, the AI receptionist for JR&CO Roofing (fictional client).",
 };
 
@@ -44,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Nav />
             <div className="topbar-right">
               {site.number && (
-                <a className="mono muted nowrap" href={`tel:${site.number}`} title={`Call ${site.agentName}`}>
+                <a className="topbar-tel" href={`tel:${site.number}`} title={`Call ${site.agentName}`}>
                   {formatUsNumber(site.number)}
                 </a>
               )}
@@ -55,8 +56,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </header>
         {children}
         <footer className="footer">
-          {site.businessName} is a fictional client; this is an assessment build. Demo and test calls are shown in full;
-          real calls are listed with personal details, transcripts and recordings hidden.
+          <p>
+            {site.businessName} is a fictional client; this is an assessment build. Demo and test calls are shown in full;
+            real calls are listed with personal details, transcripts and recordings hidden.
+          </p>
         </footer>
       </body>
     </html>

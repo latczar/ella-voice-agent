@@ -102,8 +102,8 @@ export default function TalkToElla({ assistantId, agentName }: { assistantId: st
         {status === "live" && (
           <>
             <button className="btn btn-sm" onClick={toggleMute} aria-pressed={muted}>{muted ? "Unmute" : "Mute"}</button>
-            <span className="muted" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-              <span className="live-dot" /> {muted ? "Muted" : speaking ? `${agentName} is speaking` : "Listening"}
+            <span className={`chip ${muted ? "c-neutral" : speaking ? "c-info" : "c-warn"}`} aria-live="polite">
+              {muted ? "Muted" : speaking ? `${agentName} is speaking` : "Listening to you"}
             </span>
           </>
         )}
@@ -116,14 +116,21 @@ export default function TalkToElla({ assistantId, agentName }: { assistantId: st
           <button className="btn btn-sm spacer" onClick={clear}>Clear transcript</button>
         )}
       </div>
-      {error && <div className="notice warn">{error}</div>}
+      {error && <div className="notice bad" role="alert">{error}</div>}
+      {shown.length === 0 && status !== "error" && (
+        <p className="muted">
+          {status === "connecting" || status === "live"
+            ? "Say hello. Captions appear here as you both talk."
+            : "Uses your microphone. Captions appear here during the call."}
+        </p>
+      )}
       {shown.length > 0 && (
-        <div className="card" style={{ boxShadow: "none" }}>
-          <div ref={scrollRef} className="card-body transcript" style={{ maxHeight: 280, overflowY: "auto" }}>
+        <div className="well">
+          <div ref={scrollRef} className="trail" aria-label="Live captions">
             {shown.map((l, i) => (
               <div key={i} className={`turn${l.agent ? " agent" : ""}${l === interim ? " interim" : ""}`}>
                 <div className="turn-role">{l.agent ? agentName : "You"}</div>
-                <div>{l.text}</div>
+                <div className="turn-text">{l.text}</div>
               </div>
             ))}
           </div>

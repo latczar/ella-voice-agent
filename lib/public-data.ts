@@ -150,17 +150,17 @@ export function formatUsNumber(e164: string | null): string {
 }
 
 export function formatWhen(iso: string | null, timezone: string): string {
-  if (!iso) return "—";
+  if (!iso) return "Unknown";
   return new Intl.DateTimeFormat("en-US", { timeZone: timezone, month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(iso));
 }
 
 export function formatDuration(s: number | null): string {
-  if (s == null) return "—";
+  if (s == null) return "None";
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
 export function formatCost(usd: number | null): string {
-  return usd == null ? "—" : `$${usd.toFixed(2)}`;
+  return usd == null ? "None" : `$${usd.toFixed(2)}`;
 }
 
 export function intentLabel(c: ClientConfig, id: string | null): string {
@@ -169,7 +169,7 @@ export function intentLabel(c: ClientConfig, id: string | null): string {
 }
 
 export function departmentName(c: ClientConfig, key: string | null): string {
-  if (!key) return "—";
+  if (!key) return "None";
   return c.departments[key]?.name ?? key;
 }
 

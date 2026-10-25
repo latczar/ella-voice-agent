@@ -35,7 +35,7 @@ export default function LiveRefresh({ everyMs = 10_000 }: { everyMs?: number }) 
   const ago = Math.max(0, Math.round((now - updatedAt) / 1000));
   return (
     <span className="live-pill" title="This page updates itself every few seconds">
-      <span className="live-dot" /> Live · updated {ago < 2 ? "just now" : `${ago}s ago`}
+      Live, updated {ago < 2 ? "just now" : `${ago}s ago`}
     </span>
   );
 }

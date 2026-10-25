@@ -5,7 +5,7 @@ import { Badge, Dash, PageHead, When } from "../ui";
 import { NewBadge, Row, SeenScope } from "../new-rows";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Leads · Ella console" };
+export const metadata = { title: "Leads, Ella console" };
 
 export default async function LeadsPage() {
   const c = config();
@@ -18,7 +18,7 @@ export default async function LeadsPage() {
         sub="Details Ella captured, as sent to HubSpot. Real callers' details are masked here; demo and test leads are shown in full."
         right={<LiveRefresh />}
       />
-      <section className="card">
+      <section className="panel">
         <SeenScope scope="leads" ids={leads.map((l) => l.call_id)}>
         <div className="table-wrap">
           <table className="table">
@@ -32,17 +32,17 @@ export default async function LeadsPage() {
               {leads.map((l) => (
                 <Row key={l.call_id} id={l.call_id}>
                   <td className="cell-time"><When iso={l.created_at} timezone={site.timezone} /> <NewBadge id={l.call_id} /></td>
-                  <td>{l.full_name ?? <Dash />}{l.company_name && <div className="faint">{l.company_name}</div>}</td>
-                  <td className="mono nowrap hide-sm hide-md">{l.phone ?? <Dash />}</td>
+                  <td className="cell-main">{l.full_name ?? <Dash />}{l.company_name && <div className="sub">{l.company_name}</div>}</td>
+                  <td className="measured nowrap hide-sm hide-md">{l.phone ?? <Dash />}</td>
                   <td className="hide-sm cell-wrap">
                     {l.property_address ?? <Dash />}
-                    {l.property_type && <div className="faint" style={{ textTransform: "capitalize" }}>{l.property_type}</div>}
+                    {l.property_type && <div className="sub" style={{ textTransform: "capitalize" }}>{l.property_type}</div>}
                   </td>
-                  <td className="cell-main">{intentLabel(c, l.intent)}</td>
+                  <td>{intentLabel(c, l.intent)}</td>
                   <td className="hide-sm">{l.urgency === "emergency" ? <Badge tone="warn">Emergency</Badge> : l.caller_need ? <Badge tone="neutral" plain>{l.caller_need}</Badge> : <Dash />}</td>
                   <td className="hide-sm hide-md">{l.callback_requested ? <Badge tone="info">Call-back</Badge> : <Dash />}</td>
                   <td className="right cell-actions">
-                    {!l.visible && <span className="tag">Redacted</span>} <Link className="link" href={`/calls/${encodeURIComponent(l.call_id)}`}>Call</Link>
+                    <span className="tags">{!l.visible && <span className="tag">Redacted</span>}<Link className="link" href={`/calls/${encodeURIComponent(l.call_id)}`}>Call</Link></span>
                   </td>
                 </Row>
               ))}

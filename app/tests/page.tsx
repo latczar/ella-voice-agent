@@ -6,7 +6,7 @@ import { NewBadge, NewDetails, SeenScope } from "../new-rows";
 import RunTestsPanel from "./run-tests-panel";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Tests · Ella console" };
+export const metadata = { title: "Tests, Ella console" };
 
 export default async function TestsPage() {
   const site = siteInfo();
@@ -23,20 +23,20 @@ export default async function TestsPage() {
         sub="An AI caller plays each scenario against the staging assistant, by text. Each scenario shows its latest result, the checks and the transcript as evidence."
         right={<LiveRefresh />}
       />
-      <div style={{ marginBottom: 16 }}>
+      <div className="gap-below">
         <RunTestsPanel personaCount={personaCount} costEach={ESTIMATED_COST_PER_PERSONA_USD} />
       </div>
       {!results.length ? (
-        <section className="card"><div className="empty">No test runs yet.</div></section>
+        <section className="panel"><div className="empty">No test runs yet. Results appear here after the first run.</div></section>
       ) : (
         <>
-          <div className="stats stats-3" style={{ marginBottom: 16 }}>
-            <Stat label="Last tested" value={<span style={{ fontSize: 16 }}>{formatWhen(lastTested, site.timezone)} CT</span>} />
+          <div className="seams figures figures-3">
+            <Stat label="Last tested (CT)" value={formatWhen(lastTested, site.timezone)} />
             <Stat label="Scenarios passing" value={`${passed} / ${results.length}`} />
             <Stat label="Result" value={passed === results.length ? <Badge tone="ok">All passed</Badge> : <Badge tone="bad">{results.length - passed} failed</Badge>} />
           </div>
           <SeenScope scope="tests" ids={results.map(key)}>
-            <section className="card result-list">
+            <section className="panel result-list">
               <div className="result-row result-head" aria-hidden>
                 <span>Scenario</span><span className="hide-sm">Last run (CT)</span><span className="right">Checks</span><span className="right">Result</span>
               </div>
@@ -46,19 +46,19 @@ export default async function TestsPage() {
                   <NewDetails key={r.persona} id={key(r)} className="result">
                     <summary className="result-row">
                       <span className="result-name">{r.persona} <NewBadge id={key(r)} /></span>
-                      <span className="hide-sm"><When iso={r.started_at} timezone={site.timezone} /></span>
-                      <span className="right num">{ok}/{r.assertions.length}</span>
+                      <span className="hide-sm measured" style={{ color: "var(--color-cool)" }}><When iso={r.started_at} timezone={site.timezone} /></span>
+                      <span className="right measured">{ok}/{r.assertions.length}</span>
                       <span className="right">{r.passed ? <Badge tone="ok">Pass</Badge> : <Badge tone="bad">Fail</Badge>}</span>
                     </summary>
-                    <div className="card-body grid grid-halves">
+                    <div className="result-body halves">
                       <div>
-                        <h3 style={{ marginBottom: 8 }}>Assertions</h3>
+                        <h3 style={{ marginBottom: 8 }}>Checks</h3>
                         {r.assertions.map((a) => (
-                          <div key={a.name} style={{ display: "flex", gap: 10, padding: "5px 0", borderTop: "1px solid var(--border)" }}>
-                            <Badge tone={a.passed ? "ok" : "bad"} plain>{a.passed ? "Pass" : "Fail"}</Badge>
+                          <div key={a.name} className="check">
+                            <Badge tone={a.passed ? "ok" : "bad"}>{a.passed ? "Pass" : "Fail"}</Badge>
                             <div>
                               <div>{a.name}</div>
-                              {a.detail && <div className="faint" style={{ fontSize: 12, overflowWrap: "anywhere" }}>{a.detail}</div>}
+                              {a.detail && <div className="sub">{a.detail}</div>}
                             </div>
                           </div>
                         ))}

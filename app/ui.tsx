@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { OUTCOMES } from "@/lib/public-data";
 
 export function Badge({ tone = "neutral", children, plain }: { tone?: "ok" | "warn" | "bad" | "info" | "neutral"; children: ReactNode; plain?: boolean }) {
-  return <span className={`badge b-${tone}${plain ? " plain" : ""}`}>{children}</span>;
+  return <span className={`chip c-${tone}${plain ? " plain" : ""}`}>{children}</span>;
 }
 
 export function OutcomeBadge({ outcome }: { outcome: string | null }) {
@@ -13,20 +13,20 @@ export function OutcomeBadge({ outcome }: { outcome: string | null }) {
 
 export function CallTags({ isDemo, isTest, redacted }: { isDemo: boolean; isTest: boolean; redacted: boolean }) {
   return (
-    <>
+    <span className="tags">
       {isDemo && <span className="tag">Demo</span>}
       {isTest && <span className="tag">Test</span>}
       {redacted && <span className="tag" title="Real call: personal details hidden">Redacted</span>}
-    </>
+    </span>
   );
 }
 
 export function Stat({ label, value, note }: { label: string; value: ReactNode; note?: ReactNode }) {
   return (
-    <div className="stat">
-      <div className="stat-label">{label}</div>
-      <div className="stat-value">{value}</div>
-      {note && <div className="stat-note">{note}</div>}
+    <div className="figure-cell">
+      <div className="figure-label">{label}</div>
+      <div className="figure-value">{value}</div>
+      {note && <div className="figure-note">{note}</div>}
     </div>
   );
 }
@@ -52,11 +52,11 @@ export function Transcript({ text, agentName }: { text: string; agentName: strin
     .map((m) => ({ agent: !/^(user|customer)$/i.test(m[1]), text: m[2] }));
   if (!turns.length) return <pre className="mono" style={{ whiteSpace: "pre-wrap", margin: 0 }}>{text}</pre>;
   return (
-    <div className="transcript">
+    <div className="trail">
       {turns.map((t, i) => (
         <div key={i} className={`turn${t.agent ? " agent" : ""}`}>
           <div className="turn-role">{t.agent ? agentName : "Caller"}</div>
-          <div>{t.text}</div>
+          <div className="turn-text">{t.text}</div>
         </div>
       ))}
     </div>
@@ -65,7 +65,7 @@ export function Transcript({ text, agentName }: { text: string; agentName: strin
 
 /** A readable timestamp in the client's timezone: "Today 2:45 PM", "Yesterday 9:10 AM", "Oct 21, 4:05 PM". Full date on hover. */
 export function When({ iso, timezone }: { iso: string | null; timezone: string }) {
-  if (!iso) return <span className="faint">—</span>;
+  if (!iso) return <span className="faint">Unknown</span>;
   const d = new Date(iso);
   const day = (x: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(x);
   const time = new Intl.DateTimeFormat("en-US", { timeZone: timezone, hour: "numeric", minute: "2-digit" }).format(d);
@@ -80,5 +80,5 @@ export function When({ iso, timezone }: { iso: string | null; timezone: string }
 
 /** Placeholder for an empty cell. */
 export function Dash() {
-  return <span className="faint">—</span>;
+  return <span className="faint">None</span>;
 }
