@@ -17,3 +17,6 @@ expect:
   says:
     - check: Tells the caller someone will follow up
       pattern: 'call (you )?back|follow up|get back to you|be in touch|reach out'
+      examples:
+        match: ["I'll pass this on and someone will call you back.", "The team will be in touch."]
+        no_match: ["We're a roofing company."]

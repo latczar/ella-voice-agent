@@ -186,6 +186,14 @@ table.table { width: 100%; border-collapse: collapse; }
 .run-steps li { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto auto; gap: var(--space-xs); align-items: center; padding: var(--space-xs) var(--space-sm); border-top: var(--rule-hair) solid var(--color-rule); }
 .run-steps li:first-child { border-top: none; }
 .run-note { font-size: var(--text-xs); overflow-wrap: anywhere; }
+/* Tests page: the free and paid controls sit side by side; an opened panel takes the full width. */
+.test-controls { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: flex-start; }
+.test-controls > .run-panel { flex: 1 1 100%; }
+.scenario-pick { border: none; margin: 0; padding: 0; min-width: 0; display: grid; gap: var(--space-xs); }
+.scenario-quick { display: flex; gap: var(--space-2xs); align-items: center; flex-wrap: wrap; }
+.scenario-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-pill); }
+.scenario-option { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-xs); align-items: center; padding: var(--space-2xs) var(--space-sm); border-top: var(--rule-hair) solid var(--color-rule); cursor: pointer; font-size: var(--text-sm); }
+.scenario-pick:disabled .scenario-option { cursor: not-allowed; opacity: 0.7; }
 .spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--color-rule-2); border-top-color: var(--color-cool); animation: spin 0.8s linear infinite; }
 .spinner.idle { animation: none; border-color: transparent; }
 @keyframes spin { to { transform: rotate(360deg); } }

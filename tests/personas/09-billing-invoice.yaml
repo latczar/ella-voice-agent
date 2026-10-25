@@ -18,3 +18,6 @@ expect:
   says:
     - check: Declines to take card details
       pattern: 'can(''|no)?t (take|accept|process|handle)|(not able|unable) to (take|accept|process)|(don''t|do not) (take|accept)'
+      examples:
+        match: ["I can't take card details over the phone, but Finance can help.", "I'm not able to take payments, but I can connect you to Finance."]
+        no_match: ["Sure, go ahead with the card number."]

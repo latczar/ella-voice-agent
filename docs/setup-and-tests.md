@@ -28,7 +28,7 @@ See [.env.example](../.env.example). Only the webhook secret, public Vapi key, S
 | Command | What it checks | Cost |
 |---|---|---|
 | `npm run test:unit` | Business-hours logic: open, closed, next opening, 24/7 on-call, closing time exclusive. Persona files: real tools, intents and fields only, synthetic details only, each expected transfer open at the persona's time, and the text checks match what Ella would really say | Free |
-| `npm run test:api` | Both webhooks with fake Vapi payloads: secret header enforced, every tool's happy and error paths, batches, lead merging and phone normalisation, Cal.com slot offers, end-of-call storage, outcome from the hand-off, retried reports ignored. Test rows are flagged and deleted afterwards. `TEST_ALERTS=1` also exercises the emergency alert (sends a real push) | Free |
+| `npm run test:api` | Both webhooks with fake Vapi payloads: secret header enforced, every tool's happy and error paths, batches, lead merging and phone normalisation, Cal.com slot offers, end-of-call storage, outcome from the hand-off, retried reports ignored. The dashboard's free sanity checks all pass. Test rows are flagged and deleted afterwards. `TEST_ALERTS=1` also exercises the emergency alert (sends a real push) | Free |
 | `npm run test:ui` | Every dashboard page renders with its key content; unknown calls are a 404; the live app reports every integration configured | Free |
 | `npm test` | All three of the above | Free |
 | `npm run test:personas` | AI caller simulations (below) | A few cents per persona |
@@ -39,7 +39,20 @@ Unit, API and UI tests run against `TEST_BASE_URL` (default: the deployed app). 
 
 `npm run test:personas` runs each file in [tests/personas/](../tests/personas/): a second model (GPT-4o mini) plays the caller and talks to the staging Ella **by text through Vapi's chat API**, so Ella runs with exactly the same prompt and tools as on a phone call, for cents rather than voice minutes. Test conversations pass variables that the webhooks honour only on test calls: `is_test` (flags the rows), `simulate_time` (to test after-hours routing at any time of day) and `simulate_unanswered` (to test the unanswered-transfer fallback).
 
-The same tests can be started from the dashboard's Tests page (**Run tests**). It needs the admin passcode (`DASHBOARD_ADMIN_PASSCODE`, checked on the server), runs one persona per request so each stays inside Vercel's time limit, allows one run at a time with a 10-minute cooldown, and shows the cost (about 13¢ a persona) before it starts. The shared logic is in [lib/persona-runner.ts](../lib/persona-runner.ts).
+The same tests can be started from the dashboard's Tests page (**Run tests**). You pick which scenarios to run (all, only those that failed or have never run, or any mix), so a run spends only what it needs. It needs the admin passcode (`DASHBOARD_ADMIN_PASSCODE`, checked on the server), runs one persona per request so each stays inside Vercel's time limit, allows one run at a time with a 10-minute cooldown, and shows the cost (about 20¢ a scenario) before it starts. The shared logic is in [lib/persona-runner.ts](../lib/persona-runner.ts).
+
+### Free sanity checks
+
+The Tests page also has **Sanity checks (free)**, which needs no passcode and spends no credit: it makes no calls or chats and writes nothing. It checks that:
+
+- the client config passes the schema and cross-checks, and Ella's prompt renders
+- every scenario file is sound (the same checks as `npm run test:unit`)
+- Ella and the five stand-ins exist on Vapi, and their **live prompts match the repo exactly**, so a prompt change that was never provisioned shows up as a failure
+- all tools are attached, and the phone number answers as Ella
+- both webhooks refuse a request without the right secret
+- Supabase answers, and the HubSpot, Cal.com, ntfy and webhook-secret settings are present
+
+Run it after any change and before a paid run: if it fails, a paid run would only spend credit to find the same problem. The logic is in [lib/server/sanity-checks.ts](../lib/server/sanity-checks.ts); `npm run test:api` runs it against the deployed app.
 
 Each run checks, as relevant to the persona: the intent logged, the tools called (and not called, e.g. no transfer after hours), the lead fields captured (read back from Supabase), alerts or bookings recorded, the call-back flag, empathy and the safety line, saved values that must match what the caller said (`lead_matches`), things Ella must or must never say (`says`, `never_says`), how often she may ask for something (`max_asks`), and always **no price figures** and **every turn under 25 words and at most 3 sentences** (process explanations excepted). Results and transcripts are written to Supabase and shown on the dashboard's **Tests** page.
 

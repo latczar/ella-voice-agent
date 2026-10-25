@@ -17,6 +17,12 @@ expect:
   says:
     - check: Says plainly she can't see project status
       pattern: 'can(''|no)?t (see|check|access|look up)|(don''t|do not) have access|(not able|unable) to (see|check|access|look up)'
+      examples:
+        match: ["I can't see project schedules, but I can connect you with Operations.", "I don't have access to project status."]
+        no_match: ["Let me connect you to Operations."]
   never_says:
     - check: Promises no crew or completion date
       pattern: '\b(tomorrow|this week|next week|by (monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b'
+      examples:
+        match: ["The crew will be back tomorrow.", "They should finish by Friday."]
+        no_match: ["Chris's team will let you know the schedule.", "Is there anything else I can help with today?"]

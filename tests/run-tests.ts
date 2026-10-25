@@ -3,7 +3,7 @@
 //
 // Usage: npm run test:personas                     all personas
 //        npm run test:personas -- --persona price  only personas whose file or name matches
-// Needs a payment method on the Vapi account (chat API requirement). Text only: about 13¢ a persona.
+// Needs a payment method on the Vapi account (chat API requirement). Text only: about 15 to 25¢ a persona.
 
 import "dotenv/config";
 import { execSync } from "node:child_process";

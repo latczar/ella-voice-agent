@@ -40,11 +40,14 @@ export interface Persona {
     /** Lead fields that must match a case-insensitive regex, e.g. the invoice number the caller gave. */
     lead_matches?: Record<string, string>;
     /** How often Ella may ask for something, counted in turns (e.g. a caller who won't give their name). */
-    max_asks?: { about: string; pattern: string; max: number }[];
+    max_asks?: { about: string; pattern: string; max: number; examples?: PatternExamples }[];
   };
 }
 
-export interface TextCheck { check: string; pattern: string }
+/** Sample lines a pattern should and shouldn't match, checked for free by lib/persona-lint.ts. */
+export interface PatternExamples { match?: string[]; no_match?: string[] }
+
+export interface TextCheck { check: string; pattern: string; examples?: PatternExamples }
 
 export interface Assertion { name: string; passed: boolean; detail?: string }
 
@@ -58,8 +61,8 @@ export interface HarnessContext {
   runId: string;
 }
 
-/** Rough Vapi cost of one persona conversation (both sides), from past runs. Shown before a paid run. */
-export const ESTIMATED_COST_PER_PERSONA_USD = 0.13;
+/** Rough Vapi cost of one persona conversation (both sides): past runs cost 15 to 25 cents. Shown before a paid run. */
+export const ESTIMATED_COST_PER_PERSONA_USD = 0.2;
 
 /** Every persona file, sorted, optionally filtered by file name or persona name. */
 export function loadPersonas(filter?: string): Persona[] {

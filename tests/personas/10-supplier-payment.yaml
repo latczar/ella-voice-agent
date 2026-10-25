@@ -19,3 +19,6 @@ expect:
     - check: Never asks a supplier for a property address
       # Any request for an address (an email address is fine).
       pattern: '(?<!e-?mail )\baddress\b[^.!]*\?|\bwhere is the (property|roof|job)\b'
+      examples:
+        match: ["Could I get the property address, please?", "What's the address of the job?"]
+        no_match: ["What's the best email address to reach you?", "Thanks, Alex. I'll connect you to Finance now."]

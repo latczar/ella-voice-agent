@@ -20,6 +20,12 @@ expect:
     - about: their name
       pattern: '\bname\b[^.!]*\?'
       max: 2
+      examples:
+        match: ["Can I get your name?", "Could I just take a first name, so the team knows who to ask for?"]
+        no_match: ["That's fine, your name isn't needed for this."]
     - about: their phone number
       pattern: '\b(number|phone)\b[^.!]*\?'
       max: 2
+      examples:
+        match: ["Is the number you're calling from the best one to reach you?", "What's a good phone number for you?"]
+        no_match: ["No problem, you can call us back any time."]

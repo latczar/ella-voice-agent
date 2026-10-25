@@ -4,6 +4,7 @@ import { Badge, PageHead, Stat, Transcript, When } from "../ui";
 import LiveRefresh from "../live-refresh";
 import { NewBadge, NewDetails, SeenScope } from "../new-rows";
 import RunTestsPanel from "./run-tests-panel";
+import SanityPanel from "./sanity-panel";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Tests, Ella console" };
@@ -11,7 +12,8 @@ export const metadata = { title: "Tests, Ella console" };
 export default async function TestsPage() {
   const site = siteInfo();
   const results = await getLatestPerPersona();
-  const personaCount = loadPersonas().length;
+  const lastResult = new Map(results.map((r) => [r.persona, r.passed]));
+  const scenarios = loadPersonas().map((p) => ({ file: p.file, name: p.name, lastPassed: lastResult.get(p.name) ?? null }));
   const passed = results.filter((r) => r.passed).length;
   const lastTested = results.reduce<string | null>((max, r) => (!max || r.started_at > max ? r.started_at : max), null);
   const key = (r: { run_id: string; persona: string }) => `${r.run_id}:${r.persona}`;
@@ -23,8 +25,9 @@ export default async function TestsPage() {
         sub="An AI caller plays each scenario against the staging assistant, by text. Each scenario shows its latest result, the checks and the transcript as evidence."
         right={<LiveRefresh />}
       />
-      <div className="gap-below">
-        <RunTestsPanel personaCount={personaCount} costEach={ESTIMATED_COST_PER_PERSONA_USD} />
+      <div className="gap-below test-controls">
+        <SanityPanel />
+        <RunTestsPanel scenarios={scenarios} costEach={ESTIMATED_COST_PER_PERSONA_USD} />
       </div>
       {!results.length ? (
         <section className="panel"><div className="empty">No test runs yet. Results appear here after the first run.</div></section>

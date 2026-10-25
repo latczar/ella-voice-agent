@@ -1,7 +1,7 @@
 "use client";
 
-// "Run tests" control: asks for the admin passcode, shows the cost, then steps through the
-// personas one request at a time (Vercel functions have a time limit), showing each result live.
+// "Run tests" control: pick the scenarios, enter the admin passcode, see the cost, then it steps
+// through them one request at a time (Vercel functions have a time limit), showing each result live.
 // The server checks the passcode, allows one run at a time and enforces a cooldown.
 
 import { useRouter } from "next/navigation";
@@ -25,7 +25,9 @@ const STATUS: Record<Step["status"], { label: string; tone: "ok" | "bad" | "info
   error: { label: "Error", tone: "warn" },
 };
 
-export default function RunTestsPanel({ personaCount, costEach }: { personaCount: number; costEach: number }) {
+export type ScenarioOption = { file: string; name: string; lastPassed: boolean | null };
+
+export default function RunTestsPanel({ scenarios, costEach }: { scenarios: ScenarioOption[]; costEach: number }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [passcode, setPasscode] = useState("");
@@ -33,21 +35,30 @@ export default function RunTestsPanel({ personaCount, costEach }: { personaCount
   const [error, setError] = useState<string | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [summary, setSummary] = useState<string | null>(null);
-  const estimate = `$${(personaCount * costEach).toFixed(2)}`;
+  // Credit is limited, so a run can be just the scenarios that need it.
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(scenarios.map((s) => s.file)));
+  const pick = (keep: (s: ScenarioOption) => boolean) => setSelected(new Set(scenarios.filter(keep).map((s) => s.file)));
+  const toggle = (file: string) => setSelected((prev) => {
+    const next = new Set(prev);
+    if (next.has(file)) next.delete(file); else next.add(file);
+    return next;
+  });
+  const count = selected.size;
+  const estimate = `$${(count * costEach).toFixed(2)}`;
 
   const update = (file: string, patch: Partial<Step>) => setSteps((s) => s.map((x) => (x.file === file ? { ...x, ...patch } : x)));
 
   async function run(e: React.FormEvent) {
     e.preventDefault();
-    if (busy) return;
-    if (!window.confirm(`This runs ${personaCount} test conversations against the staging assistant. It spends about ${estimate} of Vapi credit and writes test records to HubSpot and Cal.com. Go ahead?`)) return;
+    if (busy || !count) return;
+    if (!window.confirm(`This runs ${count} test conversation${count === 1 ? "" : "s"} against the staging assistant. It spends about ${estimate} of Vapi credit and writes test records to HubSpot and Cal.com. Go ahead?`)) return;
     setBusy(true);
     setError(null);
     setSummary(null);
     setSteps([]);
     let runId: string | null = null;
     try {
-      const start = await post<{ runId: string; personas: { file: string; name: string }[] }>({ action: "start", passcode });
+      const start = await post<{ runId: string; personas: { file: string; name: string }[] }>({ action: "start", passcode, files: [...selected] });
       runId = start.runId;
       setSteps(start.personas.map((p) => ({ ...p, status: "waiting" })));
       let cost = 0;
@@ -91,13 +102,32 @@ export default function RunTestsPanel({ personaCount, costEach }: { personaCount
       </div>
       <div className="panel-body" style={{ display: "grid", gap: 12 }}>
         <p className="muted">
-          Runs all {personaCount} scenarios by text against the staging assistant, one at a time (about 30 seconds each).
-          Each run costs about {estimate} in Vapi credit and creates test records in HubSpot and Cal.com, so it needs the admin passcode.
+          Runs the chosen scenarios by text against the staging assistant, one at a time (about 30 seconds each).
+          Each scenario costs about ${costEach.toFixed(2)} in Vapi credit and creates test records in HubSpot and Cal.com, so it needs the admin passcode.
+          For a free check, use Sanity checks instead.
         </p>
+        <fieldset className="scenario-pick" disabled={busy}>
+          <legend className="sr-only">Scenarios to run</legend>
+          <div className="scenario-quick">
+            <span className="faint">Select:</span>
+            <button type="button" className="btn btn-sm" onClick={() => pick(() => true)}>All</button>
+            <button type="button" className="btn btn-sm" onClick={() => pick((s) => s.lastPassed !== true)}>Failed or never run</button>
+            <button type="button" className="btn btn-sm" onClick={() => pick(() => false)}>None</button>
+          </div>
+          <div className="scenario-list">
+            {scenarios.map((s) => (
+              <label key={s.file} className="scenario-option">
+                <input type="checkbox" checked={selected.has(s.file)} onChange={() => toggle(s.file)} />
+                <span>{s.file.slice(0, 2)} {s.name}</span>
+                <span className={`chip plain c-${s.lastPassed === null ? "neutral" : s.lastPassed ? "ok" : "bad"}`}>{s.lastPassed === null ? "Never run" : s.lastPassed ? "Passed" : "Failed"}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <form onSubmit={run} className="run-form">
           <label className="sr-only" htmlFor="passcode">Admin passcode</label>
           <input id="passcode" className="input" type="password" autoComplete="current-password" placeholder="Admin passcode" value={passcode} onChange={(e) => setPasscode(e.target.value)} disabled={busy} required />
-          <button className="btn btn-primary" type="submit" disabled={busy || !passcode}>{busy ? "Running…" : `Run ${personaCount} tests (about ${estimate})`}</button>
+          <button className="btn btn-primary" type="submit" disabled={busy || !passcode || !count}>{busy ? "Running…" : count ? `Run ${count} test${count === 1 ? "" : "s"} (about ${estimate})` : "Pick at least one scenario"}</button>
         </form>
         {error && <div className="notice bad" role="alert">{error}</div>}
         {steps.length > 0 && (

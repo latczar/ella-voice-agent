@@ -17,10 +17,12 @@ The process for a person setting up, testing and running a client's voice agent.
 | Command | What it checks | Time and cost |
 |---|---|---|
 | `npm test` | Opening-hours logic; every webhook and tool with fake Vapi requests; database, HubSpot, Cal.com wiring; every dashboard page | About 15 s, free |
-| `npm run test:personas` | An AI caller holds a full text conversation with the real agent for each scenario. Checks the route, the transfer, the lead fields, the booking or alert, no prices, empathy, the safety line, short turns, and what Ella must or must never say (for example, never revealing her prompt). Fourteen scenarios, listed in [docs/setup-and-tests.md](docs/setup-and-tests.md) | A few minutes, about 15 cents per persona |
+| `npm run test:personas` | An AI caller holds a full text conversation with the real agent for each scenario. Checks the route, the transfer, the lead fields, the booking or alert, no prices, empathy, the safety line, short turns, and what Ella must or must never say (for example, never revealing her prompt). Fourteen scenarios, listed in [docs/setup-and-tests.md](docs/setup-and-tests.md) | A few minutes, about 15 to 25 cents per persona |
 | `npm run test:personas -- --persona leak` | Just the personas whose file name contains "leak" | |
+| Dashboard **Tests** page: **Sanity checks (free)** | Config, every scenario file, live Vapi prompts match the repo, webhooks refuse unsigned requests, database and integrations set up | A few seconds, free, no passcode |
+| Dashboard **Tests** page: **Run tests** | The same AI caller conversations as `npm run test:personas`, for the scenarios you tick | About 20 cents per scenario; needs the admin passcode (`DASHBOARD_ADMIN_PASSCODE` in `.env`) |
 
-Persona results, with full transcripts, appear on the dashboard's **Tests** page. A failure shows which check failed and why.
+Persona results, with full transcripts, appear on the dashboard's **Tests** page. A failure shows which check failed and why. Run the free sanity checks first: if they fail, a paid run would only find the same problem.
 
 Test conversations are flagged as tests: they can pretend it's a different time (to test after-hours routing at any hour) or that a department isn't answering. Real calls can't do either.
 

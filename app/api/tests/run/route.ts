@@ -2,7 +2,8 @@
 // records to HubSpot and Cal.com, so every request needs the admin passcode
 // (DASHBOARD_ADMIN_PASSCODE), only one run may be open at a time, and runs are spaced by a
 // cooldown. Vercel functions have a time limit, so the browser steps through the run:
-//   { action: "start", passcode }                    -> { runId, personas: [{ file, name }] }
+//   { action: "start", passcode, files? }            -> { runId, personas: [{ file, name }] }
+//                                                       (files: only these scenarios; default all)
 //   { action: "persona", passcode, runId, file }     -> one persona's result
 //   { action: "finish", passcode, runId }            -> { passed, failed }
 
@@ -22,7 +23,7 @@ const RUN_TIMEOUT_MS = 15 * 60_000;
 /** Minimum gap between the end of one run and the start of the next. */
 const COOLDOWN_MS = 10 * 60_000;
 
-type Body = { action?: string; passcode?: string; runId?: string; file?: string };
+type Body = { action?: string; passcode?: string; runId?: string; file?: string; files?: unknown };
 
 const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 const minutes = (ms: number) => Math.max(1, Math.ceil(ms / 60_000));
@@ -59,6 +60,13 @@ export async function POST(req: Request) {
   const personas = loadPersonas();
 
   if (body.action === "start") {
+    let chosen = personas;
+    if (body.files !== undefined) {
+      if (!Array.isArray(body.files) || !body.files.length || !body.files.every((f) => typeof f === "string")) return fail(400, "files must be a non-empty list of scenario file names.");
+      const unknown = body.files.filter((f) => !personas.some((p) => p.file === f));
+      if (unknown.length) return fail(400, `Unknown scenario file${unknown.length === 1 ? "" : "s"}: ${unknown.join(", ")}.`);
+      chosen = personas.filter((p) => (body.files as string[]).includes(p.file));
+    }
     const { data: open } = await supabase.from("test_runs").select("id, started_at").is("finished_at", null).order("started_at", { ascending: false });
     for (const run of open ?? []) {
       const age = Date.now() - Date.parse(run.started_at);
@@ -73,8 +81,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       runId,
-      personas: personas.map((p) => ({ file: p.file, name: p.name })),
-      estimatedCostUsd: Number((personas.length * ESTIMATED_COST_PER_PERSONA_USD).toFixed(2)),
+      personas: chosen.map((p) => ({ file: p.file, name: p.name })),
+      estimatedCostUsd: Number((chosen.length * ESTIMATED_COST_PER_PERSONA_USD).toFixed(2)),
     });
   }
 

@@ -20,5 +20,10 @@ expect:
   says:
     - check: Asks for the missing part of the address
       pattern: '(house|street) number|which number|what number|zip'
+      examples:
+        match: ["What's the house number on Sample Street?", "And the ZIP code?"]
+        no_match: ["Thanks. Is the number you're calling from the best one?"]
     - check: Reads the full address back
       pattern: '1240|twelve forty|one two four zero'
+      examples:
+        match: ["That's 1240 Sample Street, Skokie, 60076. Is that right?"]
